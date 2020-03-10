@@ -1,0 +1,3 @@
+-Ipackages/glad/include
+-Ipackages/glfw/include
+-Ipackages/glm/include
