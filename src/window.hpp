@@ -12,6 +12,8 @@
 #include <stdexcept>
 #include <string>
 
+#pragma once
+
 namespace amyinorbit::gl {
     using std::string;
     using glm::ivec2;
