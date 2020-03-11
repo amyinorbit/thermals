@@ -4,7 +4,10 @@ project(Thermal VERSION 2020.3.0 LANGUAGES CXX C)
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
-set(GLFW_DIR "packages/glfw")
+set(LIBS_DIR "packages")
+target_include_directories(${PROJECT_NAME} PRIVATE "${LIBS_DIR}/include")
+
+set(GLFW_DIR "${LIBS_DIR}/glfw")
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
 set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
@@ -18,13 +21,12 @@ target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE "GLFW_INCLUDE_NONE")
 
-
-set(GLAD_DIR "packages/glad")
+set(GLAD_DIR "${LIBS_DIR}/glad")
 add_library("glad" "${GLAD_DIR}/src/glad.c")
 target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
 target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
 
-set(GLM_DIR "packages/glm")
+set(GLM_DIR "${LIBS_DIR}/glm")
 add_subdirectory("${GLM_DIR}")
 target_link_libraries(${PROJECT_NAME} "glm")

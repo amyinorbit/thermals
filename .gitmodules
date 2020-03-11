@@ -4,3 +4,6 @@
 [submodule "packages/glfw"]
 	path = packages/glfw
 	url = git@github.com:glfw/glfw.git
+[submodule "packages/include/oglwrap"]
+	path = packages/include/oglwrap
+	url = git@github.com:Tomius/oglwrap.git
