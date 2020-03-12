@@ -7,3 +7,6 @@
 [submodule "packages/include/oglwrap"]
 	path = packages/include/oglwrap
 	url = git@github.com:Tomius/oglwrap.git
+[submodule "packages/apmath"]
+	path = packages/apmath
+	url = git@github.com:amyinorbit/apmath.git

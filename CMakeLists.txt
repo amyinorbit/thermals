@@ -27,6 +27,9 @@ target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
 target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
 
-set(GLM_DIR "${LIBS_DIR}/glm")
-add_subdirectory("${GLM_DIR}")
-target_link_libraries(${PROJECT_NAME} "glm")
+set(MATH_DIR "${LIBS_DIR}/apmath")
+add_subdirectory("${MATH_DIR}")
+target_link_libraries(${PROJECT_NAME} apmath)
+
+# set(GLUE_DIR "$")
+target_include_directories(${PROJECT_NAME} PRIVATE "include")

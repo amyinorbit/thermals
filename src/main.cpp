@@ -1,6 +1,8 @@
 #include <iostream>
 #include "app.hpp"
 
+#include <glue/shaders.hpp>
+
 using namespace amyinorbit::gl;
 
 struct basic_scene: app::scene {

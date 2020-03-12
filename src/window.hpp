@@ -8,7 +8,7 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <GLFW/glfw3.h>
-#include <glm/vec2.hpp>
+#include <apmath/vector.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -16,13 +16,13 @@
 
 namespace amyinorbit::gl {
     using std::string;
-    using glm::ivec2;
+    using math::int2;
 
 
     class window {
     public:
         struct attrib {
-            ivec2 size;
+            int2 size;
             string name;
 
             struct {
@@ -63,8 +63,8 @@ namespace amyinorbit::gl {
             impl_ = nullptr;
         }
 
-        ivec2 framebuffer_size() const {
-            ivec2 size;
+        int2 framebuffer_size() const {
+            int2 size;
             glfwGetFramebufferSize(impl_, &size.x, &size.y);
             return size;
         }

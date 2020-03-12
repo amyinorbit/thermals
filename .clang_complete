@@ -1,4 +1,4 @@
+-Iinclude
 -Ipackages/glad/include
 -Ipackages/glfw/include
--Ipackages/include
--Ipackages/glm
+-Ipackages/apmath/include
