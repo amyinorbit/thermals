@@ -28,7 +28,7 @@ namespace amyinorbit::gl {
             virtual void update(app& app) = 0;
         };
 
-        app(const window::attrib& main_window, scene* sc) : scene_(sc) {
+        app(const window::attrib& main_window, scene* sc) {
             if(!glfwInit()) throw std::runtime_error("error initialising glfw");
             glfwSetErrorCallback([](int code, const char* message) {
                 std::cerr << "gl error (" << code << "): " << message << "\n";
@@ -38,6 +38,8 @@ namespace amyinorbit::gl {
             window_.make_current();
             gladLoadGL();
             glfwSwapInterval(1);
+
+            show(sc);
         }
 
         ~app() {

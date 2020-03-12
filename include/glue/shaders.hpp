@@ -55,7 +55,8 @@ namespace amyinorbit::gl {
 
     class program : public handle {
     public:
-        program() { reset(glCreateProgram()); }
+        program() {}
+        void create() { reset(glCreateProgram()); }
         ~program() { if(is_valid()) glDeleteProgram(id()); }
 
         void attach(const shader& sh) { glAttachShader(id(), sh.id()); }
@@ -79,6 +80,10 @@ namespace amyinorbit::gl {
         template <typename T>
         void set_uniform(const std::string& name, const T& value) {
             set_uniform(get_uniform_loc(name), value);
+        }
+
+        void use() {
+            glUseProgram(id());
         }
 
     private:
