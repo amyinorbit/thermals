@@ -1,36 +1,9 @@
+#include <glue/glue.hpp>
 #include <iostream>
+#include <fstream>
 #include "app.hpp"
 
-#include <glue/glue.hpp>
-
 using namespace amyinorbit::gl;
-
-const char* vertex = R"SHADER(
-#version 410 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-
-void main()
-{
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
-}
-)SHADER";
-
-const char* fragment = R"SHADER(
-#version 410 core
-out vec4 FragColor;
-in vec2 TexCoord;
-
-uniform sampler2D ourTexture;
-
-void main()
-{
-    FragColor = texture(ourTexture, TexCoord);
-}
-)SHADER";
 
 struct BasicScene: App::Scene {
     virtual ~BasicScene() {}
@@ -39,11 +12,11 @@ struct BasicScene: App::Scene {
         std::cout << "starting scene\n";
 
         float vertices[] = {
-            // positions          // texture coords
-             0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // top right
-             0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // top left
+            // positions
+             0.8f,  0.8f, 0.0f,
+             0.8f, -0.8f, 0.0f,
+            -0.8f, -0.8f, 0.0f,
+            -0.8f,  0.8f, 0.0f,
         };
 
         unsigned int indices[] = {
@@ -53,11 +26,13 @@ struct BasicScene: App::Scene {
 
         {
             auto vsh = Shader::create(Shader::vertex);
-            if(!vsh.compile(vertex))
+            std::ifstream vsh_source("shaders/plane.vsh");
+            if(!vsh.compile(vsh_source))
                 throw std::runtime_error("error in vertex shader: " + vsh.debug_message());
 
             auto fsh = Shader::create(Shader::fragment);
-            if(!fsh.compile(fragment))
+            std::ifstream fsh_source("shaders/raymarch_1.fsh");
+            if(!fsh.compile(fsh_source))
                 throw std::runtime_error("error in fragment shader: " + fsh.debug_message());
 
             sh = Program::create();
@@ -81,24 +56,17 @@ struct BasicScene: App::Scene {
 
         Program::AttrDescr<float> pos;
         pos.count = 3;
-        pos.stride = 5;
+        pos.stride = 3;
 
-        sh.set_attrib_ptr<float>("aPos", pos);
+        sh.set_attrib_ptr<float>(0, pos);
         sh.enable_attrib(0);
-
-        Program::AttrDescr<float> uvmap;
-        uvmap.count = 2;
-        uvmap.stride = 5;
-        uvmap.offset = 3;
-
-        sh.set_attrib_ptr<float>(1, uvmap);
-        sh.enable_attrib(1);
 
         tex = Tex2D::create();
         tex.bind();
         tex.upload_data(Image("/home/amy/Desktop/test.png"));
         tex.gen_mipmaps();
         tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
+        tex.set_min_filter(Tex2D::Filter::nearest);
     }
 
     virtual void on_end(App& app) {
@@ -115,6 +83,7 @@ struct BasicScene: App::Scene {
 
         tex.bind();
         sh.use();
+        sh.set_uniform("resolution", float2(1024.f, 600.f));
         vao.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }

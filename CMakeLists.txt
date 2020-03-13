@@ -33,3 +33,9 @@ target_link_libraries(${PROJECT_NAME} apmath)
 
 # set(GLUE_DIR "$")
 target_include_directories(${PROJECT_NAME} PRIVATE "include")
+
+add_custom_target(run
+    COMMAND ${PROJECT_NAME}
+    DEPENDS ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)

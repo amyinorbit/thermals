@@ -77,16 +77,6 @@ namespace amyinorbit::gl {
     class Program : public Handle {
     public:
 
-        /*
-        void set_attrib_ptr(int loc, int count, int stride, std::size_t offset) {
-            auto e = as_enum<T>();
-            glVertexAttribPointer(loc,
-                                  count,
-                                  as_enum<T>(),
-                                  false,
-                                  sizeof(T) * stride,
-                                  (const void*)offset);
-        */
         template <typename T>
         struct AttrDescr {
             int count;
@@ -189,17 +179,17 @@ namespace amyinorbit::gl {
 
     template <>
     void Program::set_uniform(int loc, const int2& v) {
-        glUniform2iv(loc, 2, v.data);
+        glUniform2iv(loc, 1, v.data);
     }
 
     template <>
     void Program::set_uniform(int loc, const int3& v) {
-        glUniform3iv(loc, 3, v.data);
+        glUniform3iv(loc, 1, v.data);
     }
 
     template <>
     void Program::set_uniform(int loc, const int4& v) {
-        glUniform4iv(loc, 4, v.data);
+        glUniform4iv(loc, 1, v.data);
     }
 
 
@@ -210,17 +200,17 @@ namespace amyinorbit::gl {
 
     template <>
     void Program::set_uniform(int loc, const float2& v) {
-        glUniform2fv(loc, 2, v.data);
+        glUniform2fv(loc, 1, v.data);
     }
 
     template <>
     void Program::set_uniform(int loc, const float3& v) {
-        glUniform3fv(loc, 3, v.data);
+        glUniform3fv(loc, 1, v.data);
     }
 
     template <>
     void Program::set_uniform(int loc, const float4& v) {
-        glUniform4fv(loc, 4, v.data);
+        glUniform4fv(loc, 1, v.data);
     }
 
     template <>
