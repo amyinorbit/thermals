@@ -9,6 +9,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <cstdint>
 
 namespace amyinorbit::gl {
     template <typename T> constexpr GLenum as_enum();
@@ -17,4 +18,5 @@ namespace amyinorbit::gl {
     template <> constexpr GLenum as_enum<int>() { return GL_INT; }
     template <> constexpr GLenum as_enum<unsigned int>() { return GL_UNSIGNED_INT; }
     template <> constexpr GLenum as_enum<double>() { return GL_DOUBLE; }
+    template <> constexpr GLenum as_enum<std::uint8_t>() { return GL_UNSIGNED_BYTE; }
 }

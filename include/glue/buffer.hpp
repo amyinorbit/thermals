@@ -14,10 +14,10 @@
 
 namespace amyinorbit::gl {
 
-    enum class draw {
-        once = GL_STATIC_DRAW,
-        twice = GL_DYNAMIC_DRAW,
-        many = GL_STREAM_DRAW
+    enum class Usage {
+        static_draw = GL_STATIC_DRAW,
+        dynamic_draw = GL_DYNAMIC_DRAW,
+        stream_draw = GL_STREAM_DRAW,
     };
 
     class Buffer : public Handle {
@@ -25,6 +25,7 @@ namespace amyinorbit::gl {
 
         enum Type {
             vbo = GL_ARRAY_BUFFER,
+            ebo = GL_ELEMENT_ARRAY_BUFFER
         };
 
         static Buffer create(Type type) {
@@ -55,12 +56,12 @@ namespace amyinorbit::gl {
         }
 
         template <typename T, std::size_t N>
-        void set_data(const T (&data)[N], draw usage = draw::once) {
+        void set_data(const T (&data)[N], Usage usage = Usage::static_draw) {
             glBufferData((GLenum)type_, N * sizeof(T), (void*)&data[0], static_cast<GLenum>(usage));
         }
 
         template <typename T>
-        void set_data(const std::vector<T>& data, draw usage = draw::once) {
+        void set_data(const std::vector<T>& data, Usage usage = Usage::static_draw) {
             glBufferData((GLenum)type_, data.size() * sizeof(T), (void*)data.data(), static_cast<GLenum>(usage));
         }
 

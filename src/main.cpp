@@ -6,24 +6,29 @@
 using namespace amyinorbit::gl;
 
 const char* vertex = R"SHADER(
-#version 330 core
+#version 410 core
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTexCoord;
+
+out vec2 TexCoord;
 
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = vec4(aPos, 1.0);
+    TexCoord = aTexCoord;
 }
 )SHADER";
 
 const char* fragment = R"SHADER(
-#version 330 core
+#version 410 core
 out vec4 FragColor;
+in vec2 TexCoord;
 
-// uniform float alpha;
+uniform sampler2D ourTexture;
 
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.5f, 1.0f);
+    FragColor = texture(ourTexture, TexCoord);
 }
 )SHADER";
 
@@ -32,10 +37,18 @@ struct BasicScene: App::Scene {
 
     virtual void on_start(App& app) {
         std::cout << "starting scene\n";
-        static const float3 vertices[] = {
-            {-0.5f, -0.5f, 0.0f},
-            { 0.5f, -0.5f, 0.0f},
-            {0.0f,  0.5f, 0.0f}
+
+        float vertices[] = {
+            // positions          // texture coords
+             0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // top right
+             0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // top left
+        };
+
+        unsigned int indices[] = {
+            0, 1, 3,
+            1, 2, 3
         };
 
         {
@@ -56,14 +69,36 @@ struct BasicScene: App::Scene {
         sh.use();
 
         vao = VertexArray::create();
-        vao.bind();
-
         vbo = Buffer::create(Buffer::vbo);
+        ebo = Buffer::create(Buffer::ebo);
+
+
+        vao.bind();
         vbo.bind();
         vbo.set_data(vertices);
-        sh.set_attrib_ptr<float>(0, 3, 3, 0);
+        ebo.bind();
+        ebo.set_data(indices);
+
+        Program::AttrDescr<float> pos;
+        pos.count = 3;
+        pos.stride = 5;
+
+        sh.set_attrib_ptr<float>("aPos", pos);
         sh.enable_attrib(0);
 
+        Program::AttrDescr<float> uvmap;
+        uvmap.count = 2;
+        uvmap.stride = 5;
+        uvmap.offset = 3;
+
+        sh.set_attrib_ptr<float>(1, uvmap);
+        sh.enable_attrib(1);
+
+        tex = Tex2D::create();
+        tex.bind();
+        tex.upload_data(Image("/home/amy/Desktop/test.png"));
+        tex.gen_mipmaps();
+        tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
     }
 
     virtual void on_end(App& app) {
@@ -72,24 +107,25 @@ struct BasicScene: App::Scene {
 
     virtual void update(App& app) {
         time_ += app.time_step();
-        float alpha = 0.5 + std::cos(time_) / 2.0;
+        // float alpha = 0.5 + std::cos(time_) / 2.0;
 
 
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        tex.bind();
         sh.use();
-        // sh.set_uniform("alpha", alpha);
         vao.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 private:
 
     float time_;
 
     VertexArray vao;
-    Buffer vbo;
+    Buffer vbo, ebo;
     Program sh;
+    Tex2D tex;
 };
 
 int main(int argc, const char** argv) {

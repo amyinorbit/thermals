@@ -77,12 +77,29 @@ namespace amyinorbit::gl {
     class Program : public Handle {
     public:
 
+        /*
+        void set_attrib_ptr(int loc, int count, int stride, std::size_t offset) {
+            auto e = as_enum<T>();
+            glVertexAttribPointer(loc,
+                                  count,
+                                  as_enum<T>(),
+                                  false,
+                                  sizeof(T) * stride,
+                                  (const void*)offset);
+        */
+        template <typename T>
+        struct AttrDescr {
+            int count;
+            std::size_t stride;
+            std::size_t offset = 0;
+            bool normalize = false;
+        };
+
         static Program create() {
             Program p;
             p.reset(glCreateProgram());
             return p;
         }
-
 
         Program() = default;
         Program(Program&& other) : Handle(std::move(other)) {}
@@ -107,19 +124,18 @@ namespace amyinorbit::gl {
         }
 
         template <typename T>
-        void set_attrib_ptr(int loc, int count, int stride, std::size_t offset) {
-            auto e = as_enum<T>();
+        void set_attrib_ptr(int loc, const AttrDescr<T>& descr) {
             glVertexAttribPointer(loc,
-                                  count,
+                                  descr.count,
                                   as_enum<T>(),
-                                  false,
-                                  sizeof(T) * stride,
-                                  (const void*)offset);
+                                  descr.normalize,
+                                  sizeof(T) * descr.stride,
+                                  (const void*)(sizeof(T) * descr.offset));
         }
 
         template <typename T>
-        void set_attrib_ptr(const std::string& name, int count, int stride, std::size_t offset) {
-            set_attrib_ptr<T>(get_attr_loc(name), count, stride, offset);
+        void set_attrib_ptr(const std::string& name, const AttrDescr<T>& descr) {
+            set_attrib_ptr<T>(get_attr_loc(name), descr);
         }
 
         void enable_attrib(int loc) {

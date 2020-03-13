@@ -11,3 +11,4 @@
 #include "buffer.hpp"
 #include "vertex_array.hpp"
 #include "shaders.hpp"
+#include "texture.hpp"
