@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <glue/enum_utils.hpp>
 
 namespace amyinorbit::gl {
     using namespace math;
@@ -105,8 +106,24 @@ namespace amyinorbit::gl {
             return std::string(log);
         }
 
-        void set_attrib_ptr(int loc, int size, GLenum type, bool norm, std::size_t stride, const void* offset) {
-            glVertexAttribPointer(loc, size, type, norm, stride, offset);
+        template <typename T>
+        void set_attrib_ptr(int loc, int count, int stride, std::size_t offset) {
+            auto e = as_enum<T>();
+            glVertexAttribPointer(loc,
+                                  count,
+                                  as_enum<T>(),
+                                  false,
+                                  sizeof(T) * stride,
+                                  (const void*)offset);
+        }
+
+        template <typename T>
+        void set_attrib_ptr(const std::string& name, int count, int stride, std::size_t offset) {
+            set_attrib_ptr<T>(get_attr_loc(name), count, stride, offset);
+        }
+
+        void enable_attrib(int loc) {
+            glEnableVertexAttribArray(loc);
         }
 
         template <typename T>

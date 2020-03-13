@@ -32,7 +32,7 @@ struct BasicScene: App::Scene {
 
     virtual void on_start(App& app) {
         std::cout << "starting scene\n";
-        const float3 vertices[] = {
+        static const float3 vertices[] = {
             {-0.5f, -0.5f, 0.0f},
             { 0.5f, -0.5f, 0.0f},
             {0.0f,  0.5f, 0.0f}
@@ -61,8 +61,8 @@ struct BasicScene: App::Scene {
         vbo = Buffer::create(Buffer::vbo);
         vbo.bind();
         vbo.set_data(vertices);
-        sh.set_attrib_ptr(0, 3, GL_FLOAT, false, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+        sh.set_attrib_ptr<float>(0, 3, 3, 0);
+        sh.enable_attrib(0);
 
     }
 
