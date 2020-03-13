@@ -16,23 +16,23 @@
 #include <memory>
 
 namespace amyinorbit::gl {
-    class app {
+    class App {
     public:
 
-        struct scene {
-            virtual ~scene() = default;
-            virtual void on_start(app& app) = 0;
-            virtual void on_end(app& app) = 0;
-            virtual void update(app& app) = 0;
+        struct Scene {
+            virtual ~Scene() = default;
+            virtual void on_start(App& app) = 0;
+            virtual void on_end(App& app) = 0;
+            virtual void update(App& app) = 0;
         };
 
-        app(const window::attrib& main_window, scene* sc) {
+        App(const Window::Attrib& main_window, Scene* sc) {
             if(!glfwInit()) throw std::runtime_error("error initialising glfw");
             glfwSetErrorCallback([](int code, const char* message) {
                 std::cerr << "gl error (" << code << "): " << message << "\n";
             });
 
-            window_ = window(main_window);
+            window_ = Window(main_window);
             window_.make_current();
             gladLoadGL();
             glfwSwapInterval(1);
@@ -41,13 +41,13 @@ namespace amyinorbit::gl {
             last_update_ = glfwGetTime();
         }
 
-        ~app() {
+        ~App() {
             show(nullptr);
             window_.destroy();
             glfwTerminate();
         }
 
-        void show(scene* sc) {
+        void show(Scene* sc) {
             if(scene_) scene_->on_end(*this);
             scene_.reset(sc);
             if(scene_) scene_->on_start(*this);
@@ -57,7 +57,7 @@ namespace amyinorbit::gl {
             typename T,
             typename... Args,
             std::enable_if_t<std::is_constructible_v<T, Args...>>* = nullptr,
-            std::enable_if_t<std::is_base_of_v<scene, T>>* = nullptr
+            std::enable_if_t<std::is_base_of_v<Scene, T>>* = nullptr
         >
         void show(Args&&... args) {
             show(new T(std::forward<Args>(args)...));
@@ -81,24 +81,24 @@ namespace amyinorbit::gl {
         double time_step() const { return delta_; }
 
     private:
-        window window_;
-        std::unique_ptr<scene> scene_ {nullptr};
+        Window window_;
+        std::unique_ptr<Scene> scene_ {nullptr};
 
         double delta_ = 0;
         double last_update_;
     };
 
-    inline void app_main(const window::attrib& cfg, app::scene* sc) {
-        app(cfg, sc).run();
+    inline void app_main(const Window::Attrib& cfg, App::Scene* sc) {
+        App(cfg, sc).run();
     }
 
     template <
         typename T,
         typename... Args,
         std::enable_if_t<std::is_constructible_v<T, Args...>>* = nullptr,
-        std::enable_if_t<std::is_base_of_v<app::scene, T>>* = nullptr
+        std::enable_if_t<std::is_base_of_v<App::Scene, T>>* = nullptr
     >
-    void app_main(const window::attrib& cfg, Args&&... args) {
-        app(cfg, new T(std::forward<Args>(args)...)).run();
+    void app_main(const Window::Attrib& cfg, Args&&... args) {
+        App(cfg, new T(std::forward<Args>(args)...)).run();
     }
 }

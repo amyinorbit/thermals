@@ -20,22 +20,31 @@ namespace amyinorbit::gl {
         many = GL_STREAM_DRAW
     };
 
-    class buffer : public handle {
+    class Buffer : public Handle {
     public:
 
-        enum type {
+        enum Type {
             vbo = GL_ARRAY_BUFFER,
         };
 
-        buffer(type ty) : type_(ty) {}
-
-        void create() {
+        static Buffer create(Type type) {
+            Buffer bo;
+            bo.type_ = type;
             GLuint id;
             glGenBuffers(1, &id);
-            reset(id);
+            bo.reset(id);
+            return bo;
         }
 
-        ~buffer() {
+        Buffer() = default;
+        Buffer(Buffer&& other) : Handle(std::move(other)), type_(other.type_) {}
+        Buffer& operator=(Buffer&& other) {
+            Handle::operator=(std::move(other));
+            type_ = other.type_;
+            return *this;
+        }
+
+        ~Buffer() {
             if(!is_valid()) return;
             GLuint name = id();
             glDeleteBuffers(1, &name);
@@ -56,7 +65,6 @@ namespace amyinorbit::gl {
         }
 
     private:
-
-        type type_;
+        Type type_;
     };
 }

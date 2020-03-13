@@ -10,16 +10,16 @@
 #include <cstdint>
 namespace amyinorbit::gl {
 
-    struct handle {
-        handle() : id_(0), flags_(0) {}
-        explicit handle(std::uint32_t id) : id_(id), flags_(valid_flag) {}
+    struct Handle {
+        Handle() : id_(0), flags_(0) {}
+        explicit Handle(std::uint32_t id) : id_(id), flags_(valid_flag) {}
 
-        handle(handle&& other) : id_(other.id_), flags_(other.flags_) {
+        Handle(Handle&& other) : id_(other.id_), flags_(other.flags_) {
             other.id_ = 0;
             other.flags_ = 0;
         }
 
-        handle& operator=(handle&& other) {
+        Handle& operator=(Handle&& other) {
             if(&other != this) {
                 id_ = other.id_;
                 flags_ = other.flags_;
@@ -28,6 +28,9 @@ namespace amyinorbit::gl {
             }
             return *this;
         }
+
+        Handle(const Handle&) = delete;
+        Handle& operator=(const Handle&) = delete;
 
         void reset(std::uint32_t id) {
             id_ = id;
@@ -40,11 +43,11 @@ namespace amyinorbit::gl {
         operator bool() const { return is_valid(); }
         operator std::uint32_t() const { return id_; }
 
-        bool operator==(const handle& other) const {
+        bool operator==(const Handle& other) const {
             return id_ == other.id_ && flags_ == other.flags_;
         }
 
-        bool operator!=(const handle& other) const {
+        bool operator!=(const Handle& other) const {
             return !(*this == other);
         }
 

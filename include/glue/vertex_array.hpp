@@ -10,19 +10,27 @@
 #include <glue/handle.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <utility>
 
 namespace amyinorbit::gl {
-    class vertex_array : public handle {
+    class VertexArray : public Handle {
     public:
-        vertex_array() {}
 
-        void create() {
+        static VertexArray create() {
+            VertexArray vao;
             GLuint id;
             glGenVertexArrays(1, &id);
-            reset(id);
+            vao.reset(id);
+            return vao;
         }
 
-        ~vertex_array() {
+        VertexArray() = default;
+        VertexArray(VertexArray&& other) : Handle(std::move(other)) {}
+        VertexArray& operator=(VertexArray&& other) {
+            Handle::operator=(std::move(other));
+            return *this;
+        }
+        ~VertexArray() {
             if(!is_valid()) return;
             GLuint name = id();
             glDeleteVertexArrays(1, &name);

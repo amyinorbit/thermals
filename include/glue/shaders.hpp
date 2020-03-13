@@ -20,15 +20,26 @@ namespace amyinorbit::gl {
     using namespace math;
     using std::string;
 
-    class shader : public handle {
+    class Shader : public Handle {
     public:
-        enum type {
+        enum Type {
             vertex = GL_VERTEX_SHADER,
             fragment = GL_FRAGMENT_SHADER
         };
 
-        shader(type ty) { reset(glCreateShader((GLenum)ty)); }
-        ~shader() { if(is_valid()) glDeleteShader(id()); }
+        static Shader create(Type type) {
+            Shader sh;
+            sh.reset(glCreateShader((GLenum)type));
+            return sh;
+        }
+
+        Shader() = default;
+        Shader(Shader&& other) : Handle(std::move(other)) {}
+        Shader& operator=(Shader&& other) {
+            Handle::operator=(std::move(other));
+            return *this;
+        }
+        ~Shader() { if(is_valid()) glDeleteShader(id()); }
 
         bool compile(const string& source) {
             const char* ptr = source.c_str();
@@ -46,20 +57,38 @@ namespace amyinorbit::gl {
             return compile(source);
         }
 
+
+        std::string debug_message() const {
+            char log[512];
+            glGetShaderInfoLog(id(), 512, nullptr, log);
+            return std::string(log);
+        }
+
         bool is_compiled() const {
             GLint value;
             glGetShaderiv(id(), GL_COMPILE_STATUS, &value);
             return value == GL_TRUE;
         }
+
+    private:
     };
 
-    class program : public handle {
+    class Program : public Handle {
     public:
-        program() {}
-        void create() { reset(glCreateProgram()); }
-        ~program() { if(is_valid()) glDeleteProgram(id()); }
 
-        void attach(const shader& sh) { glAttachShader(id(), sh.id()); }
+        static Program create() {
+            Program p;
+            p.reset(glCreateProgram());
+            return p;
+        }
+
+
+        Program() = default;
+        Program(Program&& other) : Handle(std::move(other)) {}
+        Program& operator=(Program&& other) { Handle::operator=(std::move(other)); return *this; }
+        ~Program() { if(is_valid()) glDeleteProgram(id()); }
+
+        void attach(const Shader& sh) { glAttachShader(id(), sh.id()); }
 
         void bind_attr_loc(std::uint32_t loc, const string& attribute) {
             glBindAttribLocation(id(), loc, attribute.c_str());
@@ -68,6 +97,12 @@ namespace amyinorbit::gl {
         bool link() {
             glLinkProgram(id());
             return get(GL_LINK_STATUS) == GL_TRUE;
+        }
+
+        std::string debug_message() const {
+            char log[512];
+            glGetProgramInfoLog(id(), 512, nullptr, log);
+            return std::string(log);
         }
 
         void set_attrib_ptr(int loc, int size, GLenum type, bool norm, std::size_t stride, const void* offset) {
@@ -115,58 +150,58 @@ namespace amyinorbit::gl {
     };
 
     template <>
-    void program::set_uniform(int loc, const std::int32_t& value) {
+    void Program::set_uniform(int loc, const std::int32_t& value) {
         glUniform1i(loc, value);
     }
 
     template <>
-    void program::set_uniform(int loc, const int2& v) {
+    void Program::set_uniform(int loc, const int2& v) {
         glUniform2iv(loc, 2, v.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const int3& v) {
+    void Program::set_uniform(int loc, const int3& v) {
         glUniform3iv(loc, 3, v.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const int4& v) {
+    void Program::set_uniform(int loc, const int4& v) {
         glUniform4iv(loc, 4, v.data);
     }
 
 
     template <>
-    void program::set_uniform(int loc, const float& value) {
+    void Program::set_uniform(int loc, const float& value) {
         glUniform1f(loc, value);
     }
 
     template <>
-    void program::set_uniform(int loc, const float2& v) {
+    void Program::set_uniform(int loc, const float2& v) {
         glUniform2fv(loc, 2, v.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const float3& v) {
+    void Program::set_uniform(int loc, const float3& v) {
         glUniform3fv(loc, 3, v.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const float4& v) {
+    void Program::set_uniform(int loc, const float4& v) {
         glUniform4fv(loc, 4, v.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const mat2& m) {
+    void Program::set_uniform(int loc, const mat2& m) {
         glUniformMatrix2fv(loc, 1, false, m.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const mat3& m) {
+    void Program::set_uniform(int loc, const mat3& m) {
         glUniformMatrix3fv(loc, 1, false, m.data);
     }
 
     template <>
-    void program::set_uniform(int loc, const mat4& m) {
+    void Program::set_uniform(int loc, const mat4& m) {
         glUniformMatrix4fv(loc, 1, false, m.data);
     }
 }

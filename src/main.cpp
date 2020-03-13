@@ -19,18 +19,18 @@ const char* fragment = R"SHADER(
 #version 330 core
 out vec4 FragColor;
 
-uniform float alpha;
+// uniform float alpha;
 
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, alpha, 1.0f);
+    FragColor = vec4(1.0f, 0.5f, 0.5f, 1.0f);
 }
 )SHADER";
 
-struct basic_scene: app::scene {
-    virtual ~basic_scene() {}
+struct BasicScene: App::Scene {
+    virtual ~BasicScene() {}
 
-    virtual void on_start(app& host) {
+    virtual void on_start(App& app) {
         std::cout << "starting scene\n";
         const float3 vertices[] = {
             {-0.5f, -0.5f, 0.0f},
@@ -39,23 +39,26 @@ struct basic_scene: app::scene {
         };
 
         {
-            shader vsh(shader::vertex);
-            if(!vsh.compile(vertex)) throw std::runtime_error("error in vertex shader");
+            auto vsh = Shader::create(Shader::vertex);
+            if(!vsh.compile(vertex))
+                throw std::runtime_error("error in vertex shader: " + vsh.debug_message());
 
-            shader fsh(shader::fragment);
-            if(!fsh.compile(fragment)) throw std::runtime_error("error in fragment shader");
+            auto fsh = Shader::create(Shader::fragment);
+            if(!fsh.compile(fragment))
+                throw std::runtime_error("error in fragment shader: " + fsh.debug_message());
 
-            sh.create();
+            sh = Program::create();
             sh.attach(vsh);
             sh.attach(fsh);
-            if(!sh.link()) throw std::runtime_error("error in link step");
+            if(!sh.link())
+                throw std::runtime_error("error in link step: " + sh.debug_message());
         }
         sh.use();
 
-        vao.create();
+        vao = VertexArray::create();
         vao.bind();
 
-        vbo.create();
+        vbo = Buffer::create(Buffer::vbo);
         vbo.bind();
         vbo.set_data(vertices);
         sh.set_attrib_ptr(0, 3, GL_FLOAT, false, 3 * sizeof(float), (void*)0);
@@ -63,12 +66,12 @@ struct basic_scene: app::scene {
 
     }
 
-    virtual void on_end(app& host) {
+    virtual void on_end(App& app) {
 
     }
 
-    virtual void update(app& host) {
-        time_ += host.time_step();
+    virtual void update(App& app) {
+        time_ += app.time_step();
         float alpha = 0.5 + std::cos(time_) / 2.0;
 
 
@@ -76,7 +79,7 @@ struct basic_scene: app::scene {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         sh.use();
-        sh.set_uniform("alpha", alpha);
+        // sh.set_uniform("alpha", alpha);
         vao.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
@@ -84,21 +87,22 @@ private:
 
     float time_;
 
-    vertex_array vao;
-    buffer vbo{buffer::vbo};
-    program sh;
+    VertexArray vao;
+    Buffer vbo;
+    Program sh;
 };
 
 int main(int argc, const char** argv) {
 
-    window::attrib config;
+    Window::Attrib config;
     config.name = "Thermals";
     config.size = {1024, 600};
     config.version = {4, 1};
 
     try {
-        app_main<basic_scene>(config);
+        app_main<BasicScene>(config);
     } catch(std::exception& e) {
         std::cerr << "fatal error: " << e.what() << "\n";
+        return -1;
     }
 }

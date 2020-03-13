@@ -19,9 +19,9 @@ namespace amyinorbit::gl {
     using math::int2;
 
 
-    class window {
+    class Window {
     public:
-        struct attrib {
+        struct Attrib {
             int2 size;
             string name;
 
@@ -31,8 +31,8 @@ namespace amyinorbit::gl {
             } version;
         };
 
-        window() : impl_(nullptr) {}
-        window(const attrib& cfg) {
+        Window() : impl_(nullptr) {}
+        Window(const Attrib& cfg) {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, cfg.version.major);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, cfg.version.minor);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -43,8 +43,8 @@ namespace amyinorbit::gl {
                 throw std::runtime_error("unable to create new window");
             }
         }
-        window(window&& other) : impl_(other.impl_) { other.impl_ = nullptr; }
-        window& operator=(window&& other) {
+        Window(Window&& other) : impl_(other.impl_) { other.impl_ = nullptr; }
+        Window& operator=(Window&& other) {
             if(&other != this) {
                 impl_ = other.impl_;
                 other.impl_ = nullptr;
@@ -52,7 +52,7 @@ namespace amyinorbit::gl {
             return *this;
         }
 
-        ~window() { destroy(); }
+        ~Window() { destroy(); }
 
         bool should_close() const { return glfwWindowShouldClose(impl_); }
         void make_current() { glfwMakeContextCurrent(impl_); }
@@ -70,7 +70,6 @@ namespace amyinorbit::gl {
         }
 
     private:
-
         GLFWwindow* impl_ = nullptr;
     };
 }
