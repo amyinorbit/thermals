@@ -99,7 +99,9 @@ namespace amyinorbit::gl {
         std::uint32_t get_uniform_loc(const string& name) const {
             auto it = uniforms_.find(name);
             if(it != uniforms_.end()) return it->second;
-            return (uniforms_[name] = glGetUniformLocation(id(), name.c_str()));
+            auto loc = glGetUniformLocation(id(), name.c_str());
+            uniforms_[name] = loc;
+            return loc;
         }
 
         std::uint32_t get_attr_loc(const string& name) const {

@@ -15,8 +15,6 @@
 #include <type_traits>
 #include <memory>
 
-#pragma once
-
 namespace amyinorbit::gl {
     class app {
     public:
@@ -40,6 +38,7 @@ namespace amyinorbit::gl {
             glfwSwapInterval(1);
 
             show(sc);
+            last_update_ = glfwGetTime();
         }
 
         ~app() {
@@ -71,14 +70,22 @@ namespace amyinorbit::gl {
         }
 
         void update() {
+            double now = glfwGetTime();
+            delta_ = now - last_update_;
+            last_update_ = now;
             if(scene_) scene_->update(*this);
             window_.swap();
             glfwPollEvents();
         }
 
+        double time_step() const { return delta_; }
+
     private:
         window window_;
         std::unique_ptr<scene> scene_ {nullptr};
+
+        double delta_ = 0;
+        double last_update_;
     };
 
     inline void app_main(const window::attrib& cfg, app::scene* sc) {

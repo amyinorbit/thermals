@@ -19,9 +19,11 @@ const char* fragment = R"SHADER(
 #version 330 core
 out vec4 FragColor;
 
+uniform float alpha;
+
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = vec4(1.0f, 0.5f, alpha, 1.0f);
 }
 )SHADER";
 
@@ -30,10 +32,10 @@ struct basic_scene: app::scene {
 
     virtual void on_start(app& host) {
         std::cout << "starting scene\n";
-        static float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f
+        const float3 vertices[] = {
+            {-0.5f, -0.5f, 0.0f},
+            { 0.5f, -0.5f, 0.0f},
+            {0.0f,  0.5f, 0.0f}
         };
 
         {
@@ -66,14 +68,21 @@ struct basic_scene: app::scene {
     }
 
     virtual void update(app& host) {
+        time_ += host.time_step();
+        float alpha = 0.5 + std::cos(time_) / 2.0;
+
+
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         sh.use();
+        sh.set_uniform("alpha", alpha);
         vao.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 private:
+
+    float time_;
 
     vertex_array vao;
     buffer vbo{buffer::vbo};

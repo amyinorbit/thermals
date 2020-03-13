@@ -29,7 +29,6 @@ namespace amyinorbit::gl {
 
         buffer(type ty) : type_(ty) {}
 
-
         void create() {
             GLuint id;
             glGenBuffers(1, &id);
