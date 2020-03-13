@@ -20,7 +20,7 @@ ray createRay(vec2 uv, vec3 camPos, vec3 lookAt, float zoom) {
 }
 
 float distToScene(vec3 p){
-    return min(p.z,min(p.x,min(p.y,length(p-vec3(0.3,0.0,0.4))-0.3)));
+    return length(p-vec3(0.3,0.0,0.4))-0.3;
 }
 //Estimate normal based on distToScene function
 const float EPS=0.001;
@@ -51,7 +51,7 @@ void main() {
     float totalDist=0.0;
     float finalDist=distToScene(camRay.pos);
     int iters=0;
-    int maxIters=20;
+    int maxIters=100;
     for(iters=0;iters<maxIters&&finalDist>0.01;iters++){
         camRay.pos+=finalDist*camRay.dir;
         totalDist+=finalDist;
