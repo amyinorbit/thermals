@@ -51,7 +51,7 @@ void main() {
     float totalDist=0.0;
     float finalDist=distToScene(camRay.pos);
     int iters=0;
-    int maxIters=100;
+    int maxIters=20;
     for(iters=0;iters<maxIters&&finalDist>0.01;iters++){
         camRay.pos+=finalDist*camRay.dir;
         totalDist+=finalDist;

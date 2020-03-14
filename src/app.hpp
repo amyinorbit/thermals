@@ -35,6 +35,8 @@ namespace amyinorbit::gl {
             window_ = Window(main_window);
             window_.make_current();
             gladLoadGL();
+            auto size = window_.framebuffer_size();
+            glViewport(0, 0, size.x, size.y);
             glfwSwapInterval(1);
 
             show(sc);
@@ -79,6 +81,9 @@ namespace amyinorbit::gl {
         }
 
         double time_step() const { return delta_; }
+
+        Window& window() { return window_; }
+        const Window& window() const { return window_; }
 
     private:
         Window window_;

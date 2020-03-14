@@ -60,13 +60,6 @@ struct BasicScene: App::Scene {
 
         sh.set_attrib_ptr<float>(0, pos);
         sh.enable_attrib(0);
-
-        tex = Tex2D::create();
-        tex.bind();
-        tex.upload_data(Image("/home/amy/Desktop/test.png"));
-        tex.gen_mipmaps();
-        tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
-        tex.set_min_filter(Tex2D::Filter::nearest);
     }
 
     virtual void on_end(App& app) {
@@ -83,7 +76,8 @@ struct BasicScene: App::Scene {
 
         tex.bind();
         sh.use();
-        sh.set_uniform("resolution", float2(1024.f, 600.f));
+        auto res = app.window().framebuffer_size();
+        sh.set_uniform("resolution", float2(res.x, res.y));
         vao.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
