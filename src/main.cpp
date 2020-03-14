@@ -1,7 +1,6 @@
 #include <glue/glue.hpp>
 #include <iostream>
 #include <fstream>
-#include "app.hpp"
 
 using namespace amyinorbit::gl;
 
@@ -26,12 +25,12 @@ struct BasicScene: App::Scene {
 
         {
             auto vsh = Shader::create(Shader::vertex);
-            std::ifstream vsh_source("shaders/plane.vsh");
+            std::ifstream vsh_source("assets/shaders/plane.vsh");
             if(!vsh.compile(vsh_source))
                 throw std::runtime_error("error in vertex shader: " + vsh.debug_message());
 
             auto fsh = Shader::create(Shader::fragment);
-            std::ifstream fsh_source("shaders/raymarch_1.fsh");
+            std::ifstream fsh_source("assets/shaders/raymarch_1.fsh");
             if(!fsh.compile(fsh_source))
                 throw std::runtime_error("error in fragment shader: " + fsh.debug_message());
 

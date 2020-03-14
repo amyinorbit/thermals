@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.12)
 project(Thermal VERSION 2020.3.0 LANGUAGES CXX C)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/image.cpp)
+add_executable(${PROJECT_NAME}
+    src/main.cpp
+    src/image.cpp
+    src/SimplexNoise.cpp
+    src/scene3d.cpp
+    src/tiny_obj_loader.cc
+)
+
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 set(LIBS_DIR "packages")

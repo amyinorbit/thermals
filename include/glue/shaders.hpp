@@ -173,58 +173,58 @@ namespace amyinorbit::gl {
     };
 
     template <>
-    void Program::set_uniform(int loc, const std::int32_t& value) {
+    inline void Program::set_uniform(int loc, const std::int32_t& value) {
         glUniform1i(loc, value);
     }
 
     template <>
-    void Program::set_uniform(int loc, const int2& v) {
+    inline void Program::set_uniform(int loc, const int2& v) {
         glUniform2iv(loc, 1, v.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const int3& v) {
+    inline void Program::set_uniform(int loc, const int3& v) {
         glUniform3iv(loc, 1, v.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const int4& v) {
+    inline void Program::set_uniform(int loc, const int4& v) {
         glUniform4iv(loc, 1, v.data);
     }
 
 
     template <>
-    void Program::set_uniform(int loc, const float& value) {
+    inline void Program::set_uniform(int loc, const float& value) {
         glUniform1f(loc, value);
     }
 
     template <>
-    void Program::set_uniform(int loc, const float2& v) {
+    inline void Program::set_uniform(int loc, const float2& v) {
         glUniform2fv(loc, 1, v.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const float3& v) {
+    inline void Program::set_uniform(int loc, const float3& v) {
         glUniform3fv(loc, 1, v.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const float4& v) {
+    inline void Program::set_uniform(int loc, const float4& v) {
         glUniform4fv(loc, 1, v.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const mat2& m) {
+    inline void Program::set_uniform(int loc, const mat2& m) {
         glUniformMatrix2fv(loc, 1, false, m.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const mat3& m) {
+    inline void Program::set_uniform(int loc, const mat3& m) {
         glUniformMatrix3fv(loc, 1, false, m.data);
     }
 
     template <>
-    void Program::set_uniform(int loc, const mat4& m) {
+    inline void Program::set_uniform(int loc, const mat4& m) {
         glUniformMatrix4fv(loc, 1, false, m.data);
     }
 }

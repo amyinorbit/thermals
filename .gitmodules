@@ -10,3 +10,6 @@
 [submodule "packages/apmath"]
 	path = packages/apmath
 	url = git@github.com:amyinorbit/apmath.git
+[submodule "packages/tinyobjloader"]
+	path = packages/tinyobjloader
+	url = git@github.com:tinyobjloader/tinyobjloader.git

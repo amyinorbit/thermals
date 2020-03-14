@@ -21,12 +21,13 @@ namespace amyinorbit::gl {
 
         struct Scene {
             virtual ~Scene() = default;
-            virtual void on_start(App& app) = 0;
-            virtual void on_end(App& app) = 0;
-            virtual void update(App& app) = 0;
+            virtual void on_start(App& app) {}
+            virtual void on_end(App& app) {}
+            virtual void update(App& app) {}
+            virtual void render(App& app) {}
         };
 
-        App(const Window::Attrib& main_window, Scene* sc) {
+        App(const Window::Attrib& main_window) {
             if(!glfwInit()) throw std::runtime_error("error initialising glfw");
             glfwSetErrorCallback([](int code, const char* message) {
                 std::cerr << "gl error (" << code << "): " << message << "\n";
@@ -38,8 +39,6 @@ namespace amyinorbit::gl {
             auto size = window_.framebuffer_size();
             glViewport(0, 0, size.x, size.y);
             glfwSwapInterval(1);
-
-            show(sc);
             last_update_ = glfwGetTime();
         }
 
@@ -93,10 +92,6 @@ namespace amyinorbit::gl {
         double last_update_;
     };
 
-    inline void app_main(const Window::Attrib& cfg, App::Scene* sc) {
-        App(cfg, sc).run();
-    }
-
     template <
         typename T,
         typename... Args,
@@ -104,6 +99,8 @@ namespace amyinorbit::gl {
         std::enable_if_t<std::is_base_of_v<App::Scene, T>>* = nullptr
     >
     void app_main(const Window::Attrib& cfg, Args&&... args) {
-        App(cfg, new T(std::forward<Args>(args)...)).run();
+        App app(cfg);
+        app.show<T>(std::forward<Args>(args)...);
+        app.run();
     }
 }
