@@ -75,7 +75,11 @@ namespace amyinorbit::gl {
             glDeleteTextures(1, &name);
         }
 
-        void bind() { glBindTexture(tex_enum<Dim>, id()); }
+        void bind(int unit = 0) {
+            tex_unit_ = unit;
+            glActiveTexture(GL_TEXTURE0 + unit);
+            glBindTexture(tex_enum<Dim>, id());
+        }
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>
         void upload_data(const DataDescr<T>& descr, const T* data) {
@@ -124,16 +128,19 @@ namespace amyinorbit::gl {
             set(GL_TEXTURE_WRAP_T, static_cast<int>(t));
             set(GL_TEXTURE_WRAP_R, static_cast<int>(r));
         }
-
         void set_min_filter(Filter f) { set(GL_TEXTURE_MIN_FILTER, static_cast<int>(f)); }
         void set_mag_filter(Filter f) { set(GL_TEXTURE_MAG_FILTER, static_cast<int>(f)); }
         void gen_mipmaps() { glGenerateMipmap(tex_enum<Dim>); }
+
+        int tex_unit() const { return tex_unit_;}
 
     private:
 
         void set(GLenum property, int value) {
             glTexParameteri(tex_enum<Dim>, property, value);
         }
+
+        int tex_unit_;
     };
 
     using Tex2D = Texture<2>;

@@ -17,10 +17,10 @@ struct Camera {
 };
 
 // This should really be moved to a Uniform Buffer Object
+uniform sampler2D tex;
 uniform Camera camera;
 uniform Light light;
-
-uniform sampler2D tex;
+uniform float blend;
 
 void main() {
 
@@ -31,5 +31,8 @@ void main() {
 
     vec4 solidColor = vec4(0.5f, 0.7f, 0.8f, 1.f);
 
-    fragColor = vec4(ambiant + diffuse, 1.f) * solidColor;//texture(tex, texCoord);
+    vec4 color = mix(vec4(1.f), texture(tex, texCoord), blend);
+
+    // fragColor = texture(tex, texCoord);
+    fragColor = vec4(ambiant + diffuse, 1.f) * color;
 }

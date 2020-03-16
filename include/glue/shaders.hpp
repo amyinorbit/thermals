@@ -8,6 +8,8 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <glue/handle.hpp>
+#include <glue/enum_utils.hpp>
+#include <glue/texture.hpp>
 #include <apmath/vector.hpp>
 #include <apmath/matrix.hpp>
 #include <glad/glad.h>
@@ -15,7 +17,6 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
-#include <glue/enum_utils.hpp>
 
 namespace amyinorbit::gl {
     using namespace math;
@@ -57,7 +58,6 @@ namespace amyinorbit::gl {
 
             return compile(source);
         }
-
 
         std::string debug_message() const {
             char log[512];
@@ -140,8 +140,21 @@ namespace amyinorbit::gl {
             set_uniform(get_uniform_loc(name), value);
         }
 
+        template <int N>
+        void set_uniform(int loc, const Texture<N>& tex) {
+            glUniform1i(loc, tex.tex_unit());
+        }
+
         void use() {
             glUseProgram(id());
+        }
+
+        std::uint32_t get_uniform_loc(const string& name) const {
+            auto it = uniforms_.find(name);
+            if(it != uniforms_.end()) return it->second;
+            auto loc = glGetUniformLocation(id(), name.c_str());
+            uniforms_[name] = loc;
+            return loc;
         }
 
     private:
@@ -152,14 +165,6 @@ namespace amyinorbit::gl {
             GLint out;
             glGetProgramiv(id(), what, &out);
             return out;
-        }
-
-        std::uint32_t get_uniform_loc(const string& name) const {
-            auto it = uniforms_.find(name);
-            if(it != uniforms_.end()) return it->second;
-            auto loc = glGetUniformLocation(id(), name.c_str());
-            uniforms_[name] = loc;
-            return loc;
         }
 
         std::uint32_t get_attr_loc(const string& name) const {
