@@ -58,8 +58,8 @@ namespace amyinorbit::math {
       };
     }
 
-    mat4 rotation(quaternion r) {
-        r = normalize(r);
+    mat4 rotate(const quaternion& rot) {
+        auto r = normalize(rot);
 
         auto i2 = r.q.x*r.q.x;
         auto j2 = r.q.y*r.q.y;

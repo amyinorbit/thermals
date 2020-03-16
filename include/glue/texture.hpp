@@ -28,6 +28,7 @@ namespace amyinorbit::gl {
         bgr = GL_BGR,
         rgba = GL_RGBA,
         argb = GL_BGRA,
+        depth14_stencil8 = GL_DEPTH24_STENCIL8,
         depth_component = GL_DEPTH_COMPONENT,
         depth_stencil = GL_DEPTH_STENCIL,
     };
@@ -79,6 +80,11 @@ namespace amyinorbit::gl {
             tex_unit_ = unit;
             glActiveTexture(GL_TEXTURE0 + unit);
             glBindTexture(tex_enum<Dim>, id());
+        }
+
+        template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>
+        void allocate(const DataDescr<T>& descr) {
+
         }
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>

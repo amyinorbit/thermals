@@ -27,11 +27,10 @@ void main() {
     vec3 norm = normalize(normal);
 
     vec3 diffuse = max(dot(light.direction, norm), 0.f) * light.color;
-    vec3 ambiant = 0.1f * light.color;
+    vec3 ambiant = 0.0f * light.color;
 
-    vec4 solidColor = vec4(0.5f, 0.7f, 0.8f, 1.f);
-
-    vec4 color = mix(vec4(1.f), texture(tex, texCoord), blend);
+    vec4 solidColor = vec4(0.5f, 0.9f, 0.7f, 1.f);
+    vec4 color = mix(solidColor, texture(tex, texCoord), blend);
 
     // fragColor = texture(tex, texCoord);
     fragColor = vec4(ambiant + diffuse, 1.f) * color;

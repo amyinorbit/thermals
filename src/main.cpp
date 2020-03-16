@@ -27,7 +27,7 @@ struct BasicScene: App::Scene {
         // M = translation(0, 0, 0);
         V = math::look_at(float3(0, 1, 3), float3(0));
 
-        std::ifstream obj("assets/monkey.obj");
+        std::ifstream obj("assets/planet.obj");
         if(!obj.is_open()) abort();
 
         try {
@@ -101,8 +101,8 @@ struct BasicScene: App::Scene {
         sh.set_attrib_ptr<float>(2, uv);
         sh.enable_attrib(2);
 
-        sh.set_uniform("light.direction", float3(-1, 1, 1));
-        sh.set_uniform("light.color", float3(1, 0.8, 0.8));
+        sh.set_uniform("light.direction", float3(-1, 0, 0.2));
+        sh.set_uniform("light.color", float3(1, 0.8, 0.4));
         sh.set_uniform("blend", 0.f);
         diagnose();
     }
@@ -117,7 +117,7 @@ struct BasicScene: App::Scene {
         float x = 3.f * std::cos(time_ * 2);
         float z = 3.f * std::sin(time_ * 2);
 
-        M = math::rotate_y(time_);
+        M = math::rotate(float3(1.f, 1.f, 0.f), time_);
 
         // float dist = 1.f + 1.f * (0.5f + std::cos(time_ / 2.f));
 
