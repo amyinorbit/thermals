@@ -15,7 +15,8 @@ uniform mat4 proj;
 
 void main() {
     texCoord = i_texCoord;
-    normal = (model * vec4(i_normal, 1.f)).xyz;
-    fragPos = (model * vec4(i_position, 1.f)).xyz;
+    // normal = mat3(transpose(inverse(model))) * i_normal;
+    normal = mat3(model) * i_normal, 1.f;
+    fragPos = vec3(model * vec4(i_position, 1.f));
     gl_Position = proj * view * model * vec4(i_position, 1.f);
 }

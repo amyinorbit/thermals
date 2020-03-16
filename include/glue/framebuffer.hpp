@@ -95,6 +95,10 @@ namespace amyinorbit::gl {
             depth_ = std::move(rbo);
         }
 
+        static void clear() {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+
     private:
         std::unordered_map<int, Tex2D> colors_;
         Renderbuffer depth_;

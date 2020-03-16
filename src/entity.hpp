@@ -57,6 +57,14 @@ namespace amyinorbit::gl {
         quaternion rotation_;
     };
 
+    struct RenderData {
+        Program program;
+        Tex2D texture;
+        VertexArray vao;
+        Buffer vbo;
+        int vertex_count;
+    };
+
     struct Entity {
         struct Descr {
             std::string model;
@@ -66,8 +74,7 @@ namespace amyinorbit::gl {
         };
 
         static constexpr int max_components = 16;
-        Mesh mesh;
-        Tex2D texture;
+        RenderData render;
         Transform transform;
         Component* components[max_components] = {nullptr};
     };

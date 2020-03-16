@@ -76,7 +76,10 @@ namespace amyinorbit::gl {
             double now = glfwGetTime();
             delta_ = now - last_update_;
             last_update_ = now;
-            if(scene_) scene_->update(*this);
+            if(scene_) {
+                scene_->update(*this);
+                scene_->render(*this);
+            }
             window_.swap();
             glfwPollEvents();
         }
