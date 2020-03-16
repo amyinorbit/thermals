@@ -33,7 +33,7 @@ namespace amyinorbit::gl {
     };
 
     struct Mesh {
-        int count;
+        int count = 0;
         std::vector<Vertex> data;
     };
 

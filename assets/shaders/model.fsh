@@ -1,6 +1,6 @@
 #version 410 core
 
-in vec2 texCoords;
+in vec2 texCoord;
 in vec3 fragPos;
 in vec3 normal;
 
@@ -17,15 +17,19 @@ struct Camera {
 };
 
 // This should really be moved to a Uniform Buffer Object
-layout (location = 0) uniform Camera camera;
-layout (location = 2) uniform Light light;
+uniform Camera camera;
+uniform Light light;
 
 uniform sampler2D tex;
 
 void main() {
+
     vec3 norm = normalize(normal);
 
     vec3 diffuse = max(dot(light.direction, norm), 0.f) * light.color;
     vec3 ambiant = 0.1f * light.color;
-    fragColor = (ambiant + diffuse) * texture(tex, texCoord);
+
+    vec4 solidColor = vec4(0.5f, 0.7f, 0.8f, 1.f);
+
+    fragColor = vec4(ambiant + diffuse, 1.f) * solidColor;//texture(tex, texCoord);
 }

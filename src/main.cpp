@@ -6,20 +6,75 @@
 
 using namespace amyinorbit::gl;
 
+matrix4 translation(float dx, float dy, float dz) {
+      return matrix4{
+          1.f, 0.f, 0.f, 0.f,
+          0.f, 1.f, 0.f, 0.f,
+          0.f, 0.f, 1.f, 0.f,
+          dx,  dy,  dz,  1.f,
+      };
+  }
+
+matrix4 perspective(float fov, float aspect, float zNear, float zFar) {
+
+    const float tanHalfFov = std::tan(fov / 2.f);
+    // From GLM
+    matrix4 result(0.f);
+    result[0][0] = 1.f / (aspect * tanHalfFov);
+	result[1][1] = 1.f / (tanHalfFov);
+	result[2][2] = - (zFar + zNear) / (zFar - zNear);
+	result[2][3] = - 1.f;
+	result[3][2] = - (2.f * zFar * zNear) / (zFar - zNear);
+    return result;
+}
+
+matrix4 orthographic(float width, float height, float zNear, float zFar) {
+    auto zDiff = zFar - zNear;
+    auto zSum = zFar + zNear;
+
+    matrix4 result(1.f);
+    result[0][0] =  2.f / width;
+    result[1][1] = -2.f / height;
+    result[2][2] =  2.f / zDiff;
+    result[3][0] = -1.f;
+    result[3][1] =  1.f;
+    result[3][2] = -zSum/zDiff;
+    return result;
+}
+
+matrix4 lookAt(const float3& camera, const float3& target, const float3& up) {
+    return matrix4(1.f);
+}
+
+
 struct BasicScene: App::Scene {
     virtual ~BasicScene() {}
 
     virtual void on_start(App& app) {
         std::cout << "starting scene\n";
 
+        auto res = app.window().framebuffer_size();
+
+        P = perspective(M_PI/3.f, float(res.x)/float(res.y), 0.1f, 100.f);
+        V = translation(0, 0, -5);
+
+
         std::ifstream obj("assets/sphere.obj");
         if(!obj.is_open()) abort();
 
         try {
             model = load_object(obj);
+            std::cout << "size: " << model.count * sizeof(Vertex) << " {} " << sizeof(float) * model.count * 8 << "\n";
+
         } catch(ParseError& error) {
             std::cout << "error: " << error.what() << "\n";
+            abort();
         }
+
+        // model.data.push_back(Vertex{ float3(-0.5f, -0.5f, 0.0f), float3(), float2() });
+        // model.data.push_back(Vertex{ float3( 0.5f, -0.5f, 0.0f), float3(), float2() });
+        // model.data.push_back(Vertex{ float3( 0.0f,  0.5f, 0.0f), float3(), float2() });
+        // model.count = 3;
 
 
         {
@@ -47,21 +102,23 @@ struct BasicScene: App::Scene {
 
         vao.bind();
         vbo.bind();
+
         vbo.set_data(model.data);
 
         Program::AttrDescr<float> pos;
+        pos.offset = 0;
         pos.count = 3;
         pos.stride = 8;
 
         Program::AttrDescr<float> norm;
-        pos.offset = 3;
-        pos.count = 3;
-        pos.stride = 8;
+        norm.offset = 3;
+        norm.count = 3;
+        norm.stride = 8;
 
         Program::AttrDescr<float> uv;
-        pos.offset = 6;
-        pos.count = 2;
-        pos.stride = 8;
+        uv.offset = 6;
+        uv.count = 2;
+        uv.stride = 8;
 
         sh.set_attrib_ptr<float>(0, pos);
         sh.enable_attrib(0);
@@ -71,6 +128,9 @@ struct BasicScene: App::Scene {
 
         sh.set_attrib_ptr<float>(2, uv);
         sh.enable_attrib(2);
+
+        sh.set_uniform("light.direction", float3(1));
+        sh.set_uniform("light.color", float3(1, 0.6, 0.6));
     }
 
     virtual void on_end(App& app) {
@@ -78,24 +138,27 @@ struct BasicScene: App::Scene {
     }
 
     virtual void update(App& app) {
-        time_ += app.time_step();
-        // float alpha = 0.5 + std::cos(time_) / 2.0;
-
 
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        tex.bind();
         sh.use();
-        auto res = app.window().framebuffer_size();
-        sh.set_uniform("resolution", float2(res.x, res.y));
+        sh.set_uniform("model", M);
+        sh.set_uniform("view", V);
+        sh.set_uniform("proj", P);
         vao.bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, model.count);
     }
 private:
 
     float time_;
 
+    mat4 M = mat4::identity(), V = mat4::identity(), P = mat4::identity();
+
+    struct {
+        float3 pos;
+        float3 dir;
+    } camera;
 
     Mesh model;
     VertexArray vao;
