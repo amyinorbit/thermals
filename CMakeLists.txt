@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/SimplexNoise.cpp
     src/scene3d.cpp
     src/obj_loader.cpp
+    src/transform.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
