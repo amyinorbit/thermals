@@ -13,3 +13,6 @@
 [submodule "packages/tinyobjloader"]
 	path = packages/tinyobjloader
 	url = git@github.com:tinyobjloader/tinyobjloader.git
+[submodule "packages/apfun"]
+	path = packages/apfun
+	url = git@github.com:amyinorbit/apfun.git

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "obj_loader.hpp"
+
 using namespace amyinorbit::gl;
 
 struct BasicScene: App::Scene {
@@ -10,27 +12,24 @@ struct BasicScene: App::Scene {
     virtual void on_start(App& app) {
         std::cout << "starting scene\n";
 
-        float vertices[] = {
-            // positions
-             0.8f,  0.8f, 0.0f,
-             0.8f, -0.8f, 0.0f,
-            -0.8f, -0.8f, 0.0f,
-            -0.8f,  0.8f, 0.0f,
-        };
+        std::ifstream obj("assets/sphere.obj");
+        if(!obj.is_open()) abort();
 
-        unsigned int indices[] = {
-            0, 1, 3,
-            1, 2, 3
-        };
+        try {
+            model = load_object(obj);
+        } catch(ParseError& error) {
+            std::cout << "error: " << error.what() << "\n";
+        }
+
 
         {
             auto vsh = Shader::create(Shader::vertex);
-            std::ifstream vsh_source("assets/shaders/plane.vsh");
+            std::ifstream vsh_source("assets/shaders/model.vsh");
             if(!vsh.compile(vsh_source))
                 throw std::runtime_error("error in vertex shader: " + vsh.debug_message());
 
             auto fsh = Shader::create(Shader::fragment);
-            std::ifstream fsh_source("assets/shaders/raymarch_1.fsh");
+            std::ifstream fsh_source("assets/shaders/model.fsh");
             if(!fsh.compile(fsh_source))
                 throw std::runtime_error("error in fragment shader: " + fsh.debug_message());
 
@@ -44,21 +43,34 @@ struct BasicScene: App::Scene {
 
         vao = VertexArray::create();
         vbo = Buffer::create(Buffer::vbo);
-        ebo = Buffer::create(Buffer::ebo);
 
 
         vao.bind();
         vbo.bind();
-        vbo.set_data(vertices);
-        ebo.bind();
-        ebo.set_data(indices);
+        vbo.set_data(model.data);
 
         Program::AttrDescr<float> pos;
         pos.count = 3;
-        pos.stride = 3;
+        pos.stride = 8;
+
+        Program::AttrDescr<float> norm;
+        pos.offset = 3;
+        pos.count = 3;
+        pos.stride = 8;
+
+        Program::AttrDescr<float> uv;
+        pos.offset = 6;
+        pos.count = 2;
+        pos.stride = 8;
 
         sh.set_attrib_ptr<float>(0, pos);
         sh.enable_attrib(0);
+
+        sh.set_attrib_ptr<float>(1, norm);
+        sh.enable_attrib(1);
+
+        sh.set_attrib_ptr<float>(2, uv);
+        sh.enable_attrib(2);
     }
 
     virtual void on_end(App& app) {
@@ -84,8 +96,10 @@ private:
 
     float time_;
 
+
+    Mesh model;
     VertexArray vao;
-    Buffer vbo, ebo;
+    Buffer vbo;
     Program sh;
     Tex2D tex;
 };

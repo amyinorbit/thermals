@@ -6,7 +6,7 @@ add_executable(${PROJECT_NAME}
     src/image.cpp
     src/SimplexNoise.cpp
     src/scene3d.cpp
-    src/tiny_obj_loader.cc
+    src/obj_loader.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -37,6 +37,10 @@ target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
 set(MATH_DIR "${LIBS_DIR}/apmath")
 add_subdirectory("${MATH_DIR}")
 target_link_libraries(${PROJECT_NAME} apmath)
+
+set(FUNC_DIR "${LIBS_DIR}/apfun")
+add_subdirectory("${FUNC_DIR}")
+target_link_libraries(${PROJECT_NAME} apfun)
 
 # set(GLUE_DIR "$")
 target_include_directories(${PROJECT_NAME} PRIVATE "include")
