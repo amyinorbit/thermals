@@ -37,16 +37,16 @@ namespace amyinorbit::gl {
             return bo;
         }
 
-        Buffer() = default;
-        Buffer(Buffer&& other) : Handle(std::move(other)), type_(other.type_) {}
-        Buffer& operator=(Buffer&& other) {
-            Handle::operator=(std::move(other));
-            type_ = other.type_;
-            return *this;
-        }
+        // Buffer() = default;
+        // Buffer(Buffer&& other) : Handle(std::move(other)), type_(other.type_) {}
+        // Buffer& operator=(Buffer&& other) {
+        //     Handle::operator=(std::move(other));
+        //     type_ = other.type_;
+        //     return *this;
+        // }
 
         ~Buffer() {
-            if(!is_valid()) return;
+            if(!is_owned()) return;
             GLuint name = id();
             glDeleteBuffers(1, &name);
         }

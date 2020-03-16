@@ -62,16 +62,16 @@ namespace amyinorbit::gl {
             tex.reset(id);
             return tex;
         }
-
-        Texture() = default;
-        Texture(Texture&& other) : Handle(std::move(other)) {}
-        Texture& operator=(Texture&& other) {
-            Handle::operator=(std::move(other));
-            return *this;
-        }
+        //
+        // Texture() = default;
+        // Texture(Texture&& other) : Handle(std::move(other)) {}
+        // Texture& operator=(Texture&& other) {
+        //     Handle::operator=(std::move(other));
+        //     return *this;
+        // }
 
         ~Texture() {
-            if(!is_valid()) return;
+            if(!is_owned()) return;
             GLuint name = id();
             glDeleteTextures(1, &name);
         }
@@ -84,7 +84,11 @@ namespace amyinorbit::gl {
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>
         void allocate(const DataDescr<T>& descr) {
-
+            glTexImage2D(tex_enum<Dim>, 0,
+                         static_cast<GLenum>(descr.dest_format),
+                         descr.size.x, descr.size.y, 0,
+                         static_cast<GLenum>(descr.source_format),
+                         as_enum<T>(), nullptr);
         }
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>

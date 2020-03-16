@@ -24,14 +24,14 @@ namespace amyinorbit::gl {
             return vao;
         }
 
-        VertexArray() = default;
-        VertexArray(VertexArray&& other) : Handle(std::move(other)) {}
-        VertexArray& operator=(VertexArray&& other) {
-            Handle::operator=(std::move(other));
-            return *this;
-        }
+        // VertexArray() = default;
+        // VertexArray(VertexArray&& other) : Handle(std::move(other)) {}
+        // VertexArray& operator=(VertexArray&& other) {
+        //     Handle::operator=(std::move(other));
+        //     return *this;
+        // }
         ~VertexArray() {
-            if(!is_valid()) return;
+            if(!is_owned()) return;
             GLuint name = id();
             glDeleteVertexArrays(1, &name);
         }

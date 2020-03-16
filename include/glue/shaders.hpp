@@ -35,13 +35,13 @@ namespace amyinorbit::gl {
             return sh;
         }
 
-        Shader() = default;
-        Shader(Shader&& other) : Handle(std::move(other)) {}
-        Shader& operator=(Shader&& other) {
-            Handle::operator=(std::move(other));
-            return *this;
-        }
-        ~Shader() { if(is_valid()) glDeleteShader(id()); }
+        // Shader() = default;
+        // Shader(Shader&& other) : Handle(std::move(other)) {}
+        // Shader& operator=(Shader&& other) {
+        //     Handle::operator=(std::move(other));
+        //     return *this;
+        // }
+        ~Shader() { if(is_owned()) glDeleteShader(id()); }
 
         bool compile(const string& source) {
             const char* ptr = source.c_str();
@@ -91,10 +91,10 @@ namespace amyinorbit::gl {
             return p;
         }
 
-        Program() = default;
-        Program(Program&& other) : Handle(std::move(other)) {}
-        Program& operator=(Program&& other) { Handle::operator=(std::move(other)); return *this; }
-        ~Program() { if(is_valid()) glDeleteProgram(id()); }
+        // Program() = default;
+        // Program(Program&& other) : Handle(std::move(other)) {}
+        // Program& operator=(Program&& other) { Handle::operator=(std::move(other)); return *this; }
+        ~Program() { if(is_owned()) glDeleteProgram(id()); }
 
         void attach(const Shader& sh) { glAttachShader(id(), sh.id()); }
 

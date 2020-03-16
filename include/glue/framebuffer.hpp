@@ -27,15 +27,15 @@ namespace amyinorbit::gl {
             return rbo;
         }
 
-        Renderbuffer() = default;
-        Renderbuffer(Renderbuffer&& other) : Handle(std::move(other)) {}
-        Renderbuffer& operator=(Renderbuffer&& other) {
-            Handle::operator=(std::move(other));
-            return *this;
-        }
+        // Renderbuffer() = default;
+        // Renderbuffer(Renderbuffer&& other) : Handle(std::move(other)) {}
+        // Renderbuffer& operator=(Renderbuffer&& other) {
+        //     Handle::operator=(std::move(other));
+        //     return *this;
+        // }
 
         ~Renderbuffer() {
-            if(!is_valid()) return;
+            if(!is_owned()) return;
             GLuint name = id();
             glDeleteFramebuffers(1, &name);
         }
@@ -60,20 +60,20 @@ namespace amyinorbit::gl {
             return tex;
         }
 
-        Framebuffer() = default;
-        Framebuffer(Framebuffer&& other)
-            : Handle(std::move(other)), colors_(std::move(other.colors_)), depth_(std::move(other.depth_)) {}
-        Framebuffer& operator=(Framebuffer&& other) {
-            Handle::operator=(std::move(other));
-            if(this != &other) {
-                colors_ = std::move(other.colors_);
-                depth_ = std::move(other.depth_);
-            }
-            return *this;
-        }
+        // Framebuffer() = default;
+        // Framebuffer(Framebuffer&& other)
+        //     : Handle(std::move(other)), colors_(std::move(other.colors_)), depth_(std::move(other.depth_)) {}
+        // Framebuffer& operator=(Framebuffer&& other) {
+        //     Handle::operator=(std::move(other));
+        //     if(this != &other) {
+        //         colors_ = std::move(other.colors_);
+        //         depth_ = std::move(other.depth_);
+        //     }
+        //     return *this;
+        // }
 
         ~Framebuffer() {
-            if(!is_valid()) return;
+            if(!is_owned()) return;
             GLuint name = id();
             glDeleteFramebuffers(1, &name);
         }
