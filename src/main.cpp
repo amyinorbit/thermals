@@ -3,7 +3,7 @@
 #include <apmath/vector.hpp>
 #include <iostream>
 #include <fstream>
-
+#include "assets_lib.hpp"
 #include "obj_loader.hpp"
 
 using namespace amyinorbit;
@@ -19,54 +19,22 @@ struct BasicScene: App::Scene {
     virtual ~BasicScene() {}
 
     virtual void on_start(App& app) {
-        std::cout << "starting scene\n";
+
+        AssetsLib lib("assets");
 
         auto res = app.window().framebuffer_size();
-
         P = math::perspective(M_PI/3.f, float(res.x)/float(res.y), 0.1f, 100.f);
         // M = translation(0, 0, 0);
         V = math::look_at(float3(0, 1, 3), float3(0));
 
-        std::ifstream obj("assets/planet.obj");
-        if(!obj.is_open()) abort();
+        model = lib.model("planet.obj");
+        tex = lib.texture("tex.png");
 
-        try {
-            model = load_object(obj);
-        } catch(ParseError& error) {
-            std::cout << "error: " << error.what() << "\n";
-            abort();
-        }
-
-        {
-            auto vsh = Shader::create(Shader::vertex);
-            std::ifstream vsh_source("assets/shaders/model.vsh");
-            if(!vsh.compile(vsh_source))
-                throw std::runtime_error("error in vertex shader: " + vsh.debug_message());
-
-            auto fsh = Shader::create(Shader::fragment);
-            std::ifstream fsh_source("assets/shaders/model.fsh");
-            if(!fsh.compile(fsh_source))
-                throw std::runtime_error("error in fragment shader: " + fsh.debug_message());
-
-            sh = Program::create();
-            sh.attach(vsh);
-            sh.attach(fsh);
-            if(!sh.link())
-                throw std::runtime_error("error in link step: " + sh.debug_message());
-        }
-
-        Image img("assets/tex.png");
-        if(!img.is_loaded()) {
-            std::cout << "image not loaded\n";
-        }
-        tex = Tex2D::create();
-        tex.bind();
-        tex.upload_data(img);
-        tex.gen_mipmaps();
-        tex.set_mag_filter(Tex2D::Filter::linear);
-        tex.set_min_filter(Tex2D::Filter::nearest);
-        tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
-        std::cout << "image channels: " << img.channels() << "\n";
+        sh = Program::create();
+        sh.attach(lib.shader("model.vsh", Shader::Type::vertex));
+        sh.attach(lib.shader("model.fsh", Shader::Type::fragment));
+        if(!sh.link())
+            throw std::runtime_error("error in link step: " + sh.debug_message());
 
         sh.use();
         vao = VertexArray::create();

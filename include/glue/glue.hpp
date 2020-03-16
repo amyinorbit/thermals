@@ -12,5 +12,6 @@
 #include "vertex_array.hpp"
 #include "shaders.hpp"
 #include "texture.hpp"
+#include "framebuffer.hpp"
 #include "app.hpp"
 #include "window.hpp"

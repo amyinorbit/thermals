@@ -20,9 +20,9 @@ namespace amyinorbit {
     void Scene3D::render(App &app) {
 
         // This is really not great cache wise, but more than sufficient for our purposes
-        for(auto& entity: entities_) {
-            if(!entity[Component::graphics]) continue;
-            auto& c = *entity[Component::graphics];
-        };
+        // for(auto& entity: entities_) {
+        //     if(!entity[Component::graphics]) continue;
+        //     auto& c = *entity[Component::graphics];
+        // };
     }
 }
