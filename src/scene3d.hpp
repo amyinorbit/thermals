@@ -24,8 +24,10 @@ namespace amyinorbit {
     class Scene3D : public App::Scene {
     public:
 
-        Scene3D(AssetsLib& assets);
+        Scene3D(AssetsLib& assets) : assets_(assets), renderer_(assets, ecs) {}
         ~Scene3D();
+
+        void on_start(App& app) override;
         void update(App& app) override;
         void render(App& app) override;
     private:

@@ -16,7 +16,7 @@ void diagnose() {
 
 namespace amyinorbit {
 
-    Scene3D::Scene3D(AssetsLib& assets) : assets_(assets), renderer_(assets, ecs) {
+    void Scene3D::on_start(App& app) {
 
         renderer_.init();
 
@@ -37,11 +37,9 @@ namespace amyinorbit {
         fbo_ = Framebuffer::create();
         fbo_.bind();
 
-        uint2 size = {1024, 600};
-
         auto depth = Renderbuffer::create();
         depth.own().bind();
-        depth.allocate(TexFormat::depth24_stencil8, size);
+        depth.allocate(TexFormat::depth24_stencil8, app.point_size());
         fbo_.attach_depth_stencil(std::move(depth));
 
         color_ = Tex2D::create();
@@ -49,7 +47,7 @@ namespace amyinorbit {
         color_.allocate(Tex2D::DataDescr<std::uint8_t>{
             .source_format = TexFormat::rgb,
             .dest_format = TexFormat::rgb,
-            .size = size
+            .size = app.point_size()
         });
         color_.set_mag_filter(Tex2D::Filter::linear);
         color_.set_min_filter(Tex2D::Filter::linear);
@@ -112,6 +110,7 @@ namespace amyinorbit {
 
     void Scene3D::render(App &app) {
         fbo_.bind();
+        app.viewport(app.point_size());
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -125,6 +124,7 @@ namespace amyinorbit {
         Framebuffer::unbind_all();
         //
 
+        app.viewport(app.pixel_size());
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -49,6 +49,9 @@ namespace amyinorbit::gl {
             last_update_ = glfwGetTime();
             time_.total = 0;
             time_.delta = 0;
+
+            size_.logical = main_window.size;
+            size_.physical = size;
         }
 
         ~App() {
@@ -92,6 +95,13 @@ namespace amyinorbit::gl {
             glfwPollEvents();
         }
 
+        void viewport(const uint2& size) {
+            glViewport(0, 0, size.w, size.h);
+        }
+
+        const uint2& point_size() const { return size_.logical; }
+        const uint2& pixel_size() const { return size_.physical; }
+
         const Time& time() const { return time_; }
 
         Window& window() { return window_; }
@@ -102,6 +112,10 @@ namespace amyinorbit::gl {
         std::unique_ptr<Scene> scene_ {nullptr};
         Time time_;
         double last_update_;
+
+        struct {
+            math::uint2 physical, logical;
+        } size_;
     };
 
     template <
