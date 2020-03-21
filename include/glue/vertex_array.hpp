@@ -13,7 +13,7 @@
 #include <utility>
 
 namespace amyinorbit::gl {
-    class VertexArray : public Handle {
+    class VertexArray : public Handle<VertexArray> {
     public:
 
         static VertexArray create() {
@@ -24,14 +24,7 @@ namespace amyinorbit::gl {
             return vao;
         }
 
-        // VertexArray() = default;
-        // VertexArray(VertexArray&& other) : Handle(std::move(other)) {}
-        // VertexArray& operator=(VertexArray&& other) {
-        //     Handle::operator=(std::move(other));
-        //     return *this;
-        // }
-        ~VertexArray() {
-            if(!is_owned()) return;
+        void destroy() {
             GLuint name = id();
             glDeleteVertexArrays(1, &name);
         }

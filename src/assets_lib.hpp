@@ -15,6 +15,8 @@
 #include <stdexcept>
 
 namespace amyinorbit::gl {
+    using std::string;
+    using std::unordered_map;
 
     class AssetsLib {
     public:
@@ -41,12 +43,18 @@ namespace amyinorbit::gl {
             return shader;
         }
 
-        Mesh model(const std::string& path) {
+        const Mesh& model(const std::string& path) {
+            auto it = meshes_.find(path);
+            if(it != meshes_.end()) {
+                return meshes_.at(path);
+            }
             std::ifstream file(root_ + "/models/" + path);
             if(!file.is_open()) throw std::runtime_error("cannot open model file " + path);
-            return load_object(file);
+            return meshes_[path] = load_object(file);
         }
     private:
         const std::string root_;
+
+        unordered_map<string, Mesh> meshes_;
     };
 }

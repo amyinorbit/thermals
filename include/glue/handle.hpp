@@ -10,6 +10,7 @@
 #include <cstdint>
 namespace amyinorbit::gl {
 
+    template <typename D>
     struct Handle {
         Handle() : id_(0), flags_(0) {}
         explicit Handle(std::uint32_t id) : id_(id), flags_(valid_flag) {}
@@ -19,8 +20,11 @@ namespace amyinorbit::gl {
             other.flags_ = 0;
         }
 
+        Handle(const Handle& other) : id_(other.id_), flags_(other.flags_ & (~owned_flag)) { }
+
         Handle& operator=(Handle&& other) {
             if(&other != this) {
+                cleanup();
                 id_ = other.id_;
                 flags_ = other.flags_;
                 other.flags_ = 0;
@@ -29,8 +33,18 @@ namespace amyinorbit::gl {
             return *this;
         }
 
-        Handle(const Handle&) = default;
-        Handle& operator=(const Handle&) = default;
+        Handle& operator=(const Handle& other) {
+            if(&other != this) {
+                cleanup();
+                id_ = other.id_;
+                flags_ = other.flags_ & (~owned_flag);
+            }
+            return *this;
+        }
+
+        virtual ~Handle() {
+            cleanup();
+        }
 
         void reset(std::uint32_t id) {
             id_ = id;
@@ -59,6 +73,11 @@ namespace amyinorbit::gl {
         }
 
     private:
+        void cleanup() {
+            if(!is_owned() || !is_valid()) return;
+            static_cast<D&>(*this).destroy();
+        }
+
         static constexpr std::uint32_t valid_flag = 1 << 0;
         static constexpr std::uint32_t owned_flag = 1 << 1;
 

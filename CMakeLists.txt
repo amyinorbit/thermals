@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 project(Thermal VERSION 2020.3.0 LANGUAGES CXX C)
 
 add_executable(${PROJECT_NAME}
+    src/ecs/entity.cpp
+    src/ecs/world.cpp
     src/main.cpp
     src/image.cpp
     src/SimplexNoise.cpp

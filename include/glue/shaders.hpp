@@ -22,7 +22,7 @@ namespace amyinorbit::gl {
     using namespace math;
     using std::string;
 
-    class Shader : public Handle {
+    class Shader : public Handle<Shader> {
     public:
         enum Type {
             vertex = GL_VERTEX_SHADER,
@@ -35,13 +35,9 @@ namespace amyinorbit::gl {
             return sh;
         }
 
-        // Shader() = default;
-        // Shader(Shader&& other) : Handle(std::move(other)) {}
-        // Shader& operator=(Shader&& other) {
-        //     Handle::operator=(std::move(other));
-        //     return *this;
-        // }
-        ~Shader() { if(is_owned()) glDeleteShader(id()); }
+        void destroy() {
+            glDeleteShader(id());
+        }
 
         bool compile(const string& source) {
             const char* ptr = source.c_str();
@@ -74,7 +70,7 @@ namespace amyinorbit::gl {
     private:
     };
 
-    class Program : public Handle {
+    class Program : public Handle<Program> {
     public:
 
         template <typename T>
@@ -91,10 +87,9 @@ namespace amyinorbit::gl {
             return p;
         }
 
-        // Program() = default;
-        // Program(Program&& other) : Handle(std::move(other)) {}
-        // Program& operator=(Program&& other) { Handle::operator=(std::move(other)); return *this; }
-        ~Program() { if(is_owned()) glDeleteProgram(id()); }
+        void destroy() {
+            glDeleteProgram(id());
+        }
 
         void attach(const Shader& sh) { glAttachShader(id(), sh.id()); }
 

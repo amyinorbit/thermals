@@ -16,7 +16,7 @@
 
 namespace amyinorbit::gl {
 
-    class Renderbuffer : public Handle {
+    class Renderbuffer : public Handle<Renderbuffer> {
     public:
 
         static Renderbuffer create() {
@@ -27,15 +27,7 @@ namespace amyinorbit::gl {
             return rbo;
         }
 
-        // Renderbuffer() = default;
-        // Renderbuffer(Renderbuffer&& other) : Handle(std::move(other)) {}
-        // Renderbuffer& operator=(Renderbuffer&& other) {
-        //     Handle::operator=(std::move(other));
-        //     return *this;
-        // }
-
-        ~Renderbuffer() {
-            if(!is_owned()) return;
+        void destroy() {
             GLuint name = id();
             glDeleteFramebuffers(1, &name);
         }
@@ -49,7 +41,7 @@ namespace amyinorbit::gl {
 
     };
 
-    class Framebuffer  : public Handle {
+    class Framebuffer  : public Handle<Framebuffer> {
     public:
 
         static Framebuffer create() {
@@ -60,20 +52,7 @@ namespace amyinorbit::gl {
             return tex;
         }
 
-        // Framebuffer() = default;
-        // Framebuffer(Framebuffer&& other)
-        //     : Handle(std::move(other)), colors_(std::move(other.colors_)), depth_(std::move(other.depth_)) {}
-        // Framebuffer& operator=(Framebuffer&& other) {
-        //     Handle::operator=(std::move(other));
-        //     if(this != &other) {
-        //         colors_ = std::move(other.colors_);
-        //         depth_ = std::move(other.depth_);
-        //     }
-        //     return *this;
-        // }
-
-        ~Framebuffer() {
-            if(!is_owned()) return;
+        void destroy() {
             GLuint name = id();
             glDeleteFramebuffers(1, &name);
         }
@@ -84,10 +63,19 @@ namespace amyinorbit::gl {
         Tex2D& color_attachment(int idx) { return colors_.at(idx); }
         const Tex2D& color_attachment(int idx) const { return colors_.at(idx); }
 
+        void attach_color(int idx, const Tex2D& tex) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, tex.id(), 0);
+            colors_.insert(std::make_pair(idx, tex));
+        }
+
         void attach_color(int idx, Tex2D&& tex) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, tex.id(), 0);
             colors_.insert(std::make_pair(idx, std::move(tex)));
-            // colors_[idx] = std::move(tex);
+        }
+
+        void attach_depth_stencil(const Renderbuffer& rbo) {
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo.id());
+            depth_ = rbo;
         }
 
         void attach_depth_stencil(Renderbuffer&& rbo) {

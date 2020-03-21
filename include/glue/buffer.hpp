@@ -10,6 +10,7 @@
 #include <glue/handle.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 #include <vector>
 
 namespace amyinorbit::gl {
@@ -20,7 +21,7 @@ namespace amyinorbit::gl {
         stream_draw = GL_STREAM_DRAW,
     };
 
-    class Buffer : public Handle {
+    class Buffer : public Handle<Buffer> {
     public:
 
         enum Type {
@@ -37,16 +38,8 @@ namespace amyinorbit::gl {
             return bo;
         }
 
-        // Buffer() = default;
-        // Buffer(Buffer&& other) : Handle(std::move(other)), type_(other.type_) {}
-        // Buffer& operator=(Buffer&& other) {
-        //     Handle::operator=(std::move(other));
-        //     type_ = other.type_;
-        //     return *this;
-        // }
-
-        ~Buffer() {
-            if(!is_owned()) return;
+        void destroy() {
+            std::cerr << "Destroying buffer " << id() << "\n";
             GLuint name = id();
             glDeleteBuffers(1, &name);
         }

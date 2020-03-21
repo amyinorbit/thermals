@@ -9,6 +9,7 @@
 #pragma once
 #include <glue/glue.hpp>
 #include <apmath/vector.hpp>
+#include <ecs/world.hpp>
 #include "entity.hpp"
 #include "assets_lib.hpp"
 #include <string>
@@ -52,9 +53,11 @@ namespace amyinorbit {
             return math::look_at(camera_.position, camera_.target);
         }
 
-        std::vector<Entity> entities_;
+        ecs::World entities_;
         Light light_;
         Camera camera_{float3{0.f, 10.f, 10.f}, float3{0.f, 0.f, 0.f}, 60.f};
         AssetsLib& assets_;
+        Framebuffer fbo_;
+        Tex2D color_;
     };
 }
