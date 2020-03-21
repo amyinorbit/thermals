@@ -15,6 +15,8 @@ namespace amyinorbit {
 
         entities_.add_component<int>(test, 123);
 
+        std::cout << "component: " << entities_.get_component<int>(test) << "\n";
+
 
         camera_.position = float3(0, 0, 10);
         camera_.target = float3(0, 0, 0);
@@ -57,8 +59,9 @@ namespace amyinorbit {
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for(auto e: entities_.with<Transform>()) {
-            e.get_component<Transform>().set_position(float3(1, 0, 0));
+        for(auto e: entities_.with<int>()) {
+            // e.get_component<Transform>().set_position(float3(1, 0, 0));
+            std::cout << "read: " << e.get_component<int>() << "\n";
         }
 
         Framebuffer::unbind_all();

@@ -89,7 +89,7 @@ namespace amyinorbit::ecs {
         template <typename T, typename... Args>
         T& add_component(Entity entity, Args&&... args) {
             assert(is_valid(entity));
-            masks_[entity.id] |= component_id<T>();
+            masks_[entity.id] |= type_mask<T>();
             return store<T>().make(entity.id, std::forward<Args>(args)...);
         }
 
