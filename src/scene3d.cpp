@@ -14,9 +14,17 @@ namespace amyinorbit {
         auto test = entities_.create();
 
         entities_.add_component<int>(test, 123);
+        entities_.add_component<Transform>(test);
 
         std::cout << "component: " << entities_.get_component<int>(test) << "\n";
 
+        for(auto [t]: entities_.with<Transform>()) {
+            t.set_position(float3(1, 2, 3));
+        }
+
+        for(auto [v]: entities_.with<Transform>()) {
+            std::cout << "value: " << v.position() << "\n";
+        }
 
         camera_.position = float3(0, 0, 10);
         camera_.target = float3(0, 0, 0);
@@ -50,19 +58,10 @@ namespace amyinorbit {
 
     }
 
-    std::pair<int, Entity&> Scene3D::create(const Entity::Descr& descr) {
-
-    }
-
     void Scene3D::render(App &app) {
         fbo_.bind();
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        for(auto e: entities_.with<int>()) {
-            // e.get_component<Transform>().set_position(float3(1, 0, 0));
-            std::cout << "read: " << e.get_component<int>() << "\n";
-        }
 
         Framebuffer::unbind_all();
     }

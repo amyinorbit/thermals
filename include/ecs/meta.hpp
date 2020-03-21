@@ -35,7 +35,8 @@ namespace amyinorbit::ecs {
         return type_mask<C1>() | type_mask<C1, Cs...>();
     }
 
-    // Type list utilities
+    // MARK: - Type list utilities
+    // List inclusion check
 
     template <typename T, typename...>
     struct in_list;
@@ -54,4 +55,19 @@ namespace amyinorbit::ecs {
 
     template <typename T, typename... Us>
     constexpr bool in_list_v = in_list<T, type_list<Us...>>::value;
+
+    // List element getting
+
+    template <std::size_t N, typename... Ts>
+    struct nth_type;
+
+    template <typename T0, typename... Us>
+    struct nth_type<0, type_list<T0, Us...>> { using type = T0; };
+
+    template <std::size_t N, typename T0, typename... Us>
+    struct nth_type<N, type_list<T0, Us...>> {
+        using type = typename nth_type<N-1, type_list<Us...>>::type; };
+
+    template <std::size_t N, typename... Ts>
+    using nth_type_t = typename nth_type<N, type_list<Ts...>>::type;
 }
