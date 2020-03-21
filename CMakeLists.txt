@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME}
     src/image.cpp
     src/SimplexNoise.cpp
     src/scene3d.cpp
+    src/model_renderer.cpp
     src/obj_loader.cpp
     src/transform.cpp
 )

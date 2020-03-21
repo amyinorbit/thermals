@@ -1,5 +1,5 @@
 //===--------------------------------------------------------------------------------------------===
-// shaders.hpp - Shader and programme wrappers for C++
+// Stages.hpp - Stage and Shaderme wrappers for C++
 //
 // Created by Amy Parent <amy@amyparent.com>
 // Copyright (c) 2019 Amy Parent
@@ -22,20 +22,20 @@ namespace amyinorbit::gl {
     using namespace math;
     using std::string;
 
-    class Shader : public Handle<Shader> {
+    class Stage : public Handle<Stage> {
     public:
         enum Type {
             vertex = GL_VERTEX_SHADER,
             fragment = GL_FRAGMENT_SHADER
         };
 
-        static Shader create(Type type) {
-            Shader sh;
-            sh.reset(glCreateShader((GLenum)type));
-            return sh;
+        static Stage create(Type type) {
+            Stage sh;
+            return sh.reset(glCreateShader((GLenum)type));
         }
 
         void destroy() {
+            std::cerr << "destroying shader stage #" << id() << "\n";
             glDeleteShader(id());
         }
 
@@ -70,7 +70,7 @@ namespace amyinorbit::gl {
     private:
     };
 
-    class Program : public Handle<Program> {
+    class Shader : public Handle<Shader> {
     public:
 
         template <typename T>
@@ -81,17 +81,39 @@ namespace amyinorbit::gl {
             bool normalize = false;
         };
 
-        static Program create() {
-            Program p;
-            p.reset(glCreateProgram());
-            return p;
+        static Shader create(std::istream& vertex, std::istream& fragment) {
+            Stage vs = Stage::create(Stage::vertex);
+            vs.own();
+            if(!vs.compile(vertex))
+                throw std::runtime_error("Error in vertex shader: " + vs.debug_message());
+
+            Stage fs = Stage::create(Stage::fragment);
+            fs.own();
+            if(!fs.compile(fragment))
+                throw std::runtime_error("Error in fragment shader: " + fs.debug_message());
+
+            Shader shader;
+            shader.reset(glCreateProgram());
+            shader.attach(vs);
+            shader.attach(fs);
+            if(!shader.link())
+                throw std::runtime_error("Error in shader: " + shader.debug_message());
+
+            std::cerr << "shader successfully compiked & linked\n";
+            return shader;
+        }
+
+        static Shader create() {
+            Shader p;
+            return p.reset(glCreateProgram());
         }
 
         void destroy() {
+            std::cerr << "destroying shader program #" << id() << "\n";
             glDeleteProgram(id());
         }
 
-        void attach(const Shader& sh) { glAttachShader(id(), sh.id()); }
+        void attach(const Stage& sh) { glAttachShader(id(), sh.id()); }
 
         void bind_attr_loc(std::uint32_t loc, const string& attribute) {
             glBindAttribLocation(id(), loc, attribute.c_str());
@@ -173,58 +195,58 @@ namespace amyinorbit::gl {
     };
 
     template <>
-    inline void Program::set_uniform(int loc, const std::int32_t& value) {
+    inline void Shader::set_uniform(int loc, const std::int32_t& value) {
         glUniform1i(loc, value);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const int2& v) {
+    inline void Shader::set_uniform(int loc, const int2& v) {
         glUniform2iv(loc, 1, v.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const int3& v) {
+    inline void Shader::set_uniform(int loc, const int3& v) {
         glUniform3iv(loc, 1, v.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const int4& v) {
+    inline void Shader::set_uniform(int loc, const int4& v) {
         glUniform4iv(loc, 1, v.data);
     }
 
 
     template <>
-    inline void Program::set_uniform(int loc, const float& value) {
+    inline void Shader::set_uniform(int loc, const float& value) {
         glUniform1f(loc, value);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const float2& v) {
+    inline void Shader::set_uniform(int loc, const float2& v) {
         glUniform2fv(loc, 1, v.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const float3& v) {
+    inline void Shader::set_uniform(int loc, const float3& v) {
         glUniform3fv(loc, 1, v.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const float4& v) {
+    inline void Shader::set_uniform(int loc, const float4& v) {
         glUniform4fv(loc, 1, v.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const mat2& m) {
+    inline void Shader::set_uniform(int loc, const mat2& m) {
         glUniformMatrix2fv(loc, 1, false, m.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const mat3& m) {
+    inline void Shader::set_uniform(int loc, const mat3& m) {
         glUniformMatrix3fv(loc, 1, false, m.data);
     }
 
     template <>
-    inline void Program::set_uniform(int loc, const mat4& m) {
+    inline void Shader::set_uniform(int loc, const mat4& m) {
         glUniformMatrix4fv(loc, 1, false, m.data);
     }
 }

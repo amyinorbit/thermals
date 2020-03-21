@@ -8,6 +8,8 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <cstdint>
+#include <cstdlib>
+
 namespace amyinorbit::gl {
 
     template <typename D>
@@ -46,15 +48,17 @@ namespace amyinorbit::gl {
             cleanup();
         }
 
-        void reset(std::uint32_t id) {
+        D& reset(std::uint32_t id) {
             id_ = id;
-            flags_ |= valid_flag;
+            flags_ = valid_flag;
+            return static_cast<D&>(*this);
         }
 
-        void own() {
+        D& own() {
             if(is_valid()) {
                 flags_ |= owned_flag;
             }
+            return static_cast<D&>(*this);
         }
 
         std::uint32_t id() const { return id_; }
@@ -75,6 +79,7 @@ namespace amyinorbit::gl {
     private:
         void cleanup() {
             if(!is_owned() || !is_valid()) return;
+            // abort();
             static_cast<D&>(*this).destroy();
         }
 

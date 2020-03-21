@@ -10,12 +10,6 @@
 using namespace amyinorbit;
 using namespace amyinorbit::gl;
 
-void diagnose() {
-    auto err = glGetError();
-    if(err == GL_NO_ERROR) return;
-    std::cerr << "gl error [" << err << "]\n";
-}
-
 int main(int argc, const char** argv) {
 
     Window::Attrib config;

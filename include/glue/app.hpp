@@ -19,6 +19,11 @@ namespace amyinorbit::gl {
     class App {
     public:
 
+        struct Time {
+            float delta;
+            float total;
+        };
+
         struct Scene {
             virtual ~Scene() = default;
             virtual void on_start(App& app) {}
@@ -42,6 +47,8 @@ namespace amyinorbit::gl {
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_CULL_FACE);
             last_update_ = glfwGetTime();
+            time_.total = 0;
+            time_.delta = 0;
         }
 
         ~App() {
@@ -74,7 +81,8 @@ namespace amyinorbit::gl {
 
         void update() {
             double now = glfwGetTime();
-            delta_ = now - last_update_;
+            time_.delta = now - last_update_;
+            time_.total += time_.delta;
             last_update_ = now;
             if(scene_) {
                 scene_->update(*this);
@@ -84,7 +92,7 @@ namespace amyinorbit::gl {
             glfwPollEvents();
         }
 
-        double time_step() const { return delta_; }
+        const Time& time() const { return time_; }
 
         Window& window() { return window_; }
         const Window& window() const { return window_; }
@@ -92,8 +100,7 @@ namespace amyinorbit::gl {
     private:
         Window window_;
         std::unique_ptr<Scene> scene_ {nullptr};
-
-        double delta_ = 0;
+        Time time_;
         double last_update_;
     };
 

@@ -11,6 +11,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <utility>
+#include <iostream>
 
 namespace amyinorbit::gl {
     class VertexArray : public Handle<VertexArray> {
@@ -25,6 +26,7 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
+            std::cerr << "destroying vertex array #" << id() << "\n";
             GLuint name = id();
             glDeleteVertexArrays(1, &name);
         }

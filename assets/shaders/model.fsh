@@ -32,7 +32,7 @@ void main() {
     vec3 ambiant = 0.1f * light.color;
 
     vec4 solidColor = vec4(0.5f, 0.9f, 0.7f, 1.f);
-    vec4 color = mix(solidColor, texture(tex, texCoord), blend);
+    vec4 color = mix(solidColor, texture(tex, texCoord), 0.f);
 
     // fragColor = texture(tex, texCoord);
     // vec4 color = vec4(normal, 1.f);

@@ -39,13 +39,19 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
-            std::cerr << "Destroying buffer " << id() << "\n";
+            // abort();
+            std::cerr << "destroying buffer #" << id() << "\n";
             GLuint name = id();
             glDeleteBuffers(1, &name);
         }
 
         void bind() {
             glBindBuffer((GLenum)type_, id());
+        }
+
+        template <typename T>
+        void allocate(std::size_t count, Usage usage = Usage::static_draw) {
+            glBufferData((GLenum)type_, count * sizeof(T), nullptr, static_cast<GLenum>(usage));
         }
 
         template <typename T, std::size_t N>
@@ -56,6 +62,22 @@ namespace amyinorbit::gl {
         template <typename T>
         void set_data(const std::vector<T>& data, Usage usage = Usage::static_draw) {
             glBufferData((GLenum)type_, data.size() * sizeof(T), (void*)data.data(), static_cast<GLenum>(usage));
+        }
+
+        template <typename T, std::size_t N>
+        std::size_t sub_data(std::size_t offset, const T (&data)[N]) {
+            std::size_t size = N * sizeof(T);
+            offset *= sizeof(T);
+            glBufferSubData((GLenum)type_, (GLintptr)offset, size, (void*)&data[0]);
+            return N;
+        }
+
+        template <typename T>
+        std::size_t sub_data(std::size_t offset, const std::vector<T>& data) {
+            std::size_t size = data.size() * sizeof(T);
+            offset *= sizeof(T);
+            glBufferSubData((GLenum)type_, (GLintptr)offset, size, (void*)data.data());
+            return data.size();
         }
 
     private:

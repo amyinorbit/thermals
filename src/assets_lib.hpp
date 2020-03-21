@@ -35,12 +35,17 @@ namespace amyinorbit::gl {
             return tex;
         }
 
-        Shader shader(const std::string& path, Shader::Type type) {
-            auto shader = Shader::create(type);
-            std::ifstream source(root_ + "/shaders/" + path);
-            if(!source.is_open()) throw std::runtime_error("cannot open texture file " + path);
-            if(!shader.compile(source)) throw std::runtime_error("error in shader: " + shader.debug_message());
-            return shader;
+        Shader shader(const std::string& vertex, const std::string& fragment) {
+            // auto key = vertex + "+" + fragment;
+            // if(shaders_.count(key)) return shaders_.at(key);
+
+            auto vs_source = open(root_ + "/shaders/" + vertex);
+            auto fs_source = open(root_ + "/shaders/" + fragment);
+            return Shader::create(vs_source, fs_source);
+
+            // shaders_[key] = Shader::create(vs_source, fs_source);
+            // shaders_[key].own();
+            // return shaders_.at(key);
         }
 
         const Mesh& model(const std::string& path) {
@@ -52,9 +57,22 @@ namespace amyinorbit::gl {
             if(!file.is_open()) throw std::runtime_error("cannot open model file " + path);
             return meshes_[path] = load_object(file);
         }
-    private:
-        const std::string root_;
 
+        void clear() {
+            shaders_.clear();
+            meshes_.clear();
+        }
+
+    private:
+        std::ifstream open(const std::string path) {
+            std::ifstream file(path);
+            if(!file.is_open())
+                throw std::runtime_error("unable to open file at path '" + path + "'");
+            return file;
+        }
+
+        const std::string root_;
+        unordered_map<string, Shader> shaders_;
         unordered_map<string, Mesh> meshes_;
     };
 }

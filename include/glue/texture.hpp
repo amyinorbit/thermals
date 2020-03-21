@@ -65,6 +65,7 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
+            std::cerr << "destroying texture #" << Base::id() << "\n";
             GLuint name = Base::id();
             glDeleteTextures(1, &name);
         }

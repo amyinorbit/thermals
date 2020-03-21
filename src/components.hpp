@@ -19,13 +19,6 @@ namespace amyinorbit::gl {
     using math::float3;
     using math::quaternion;
 
-    struct Entity;
-
-    struct Component {
-        virtual ~Component() {}
-        virtual void update(Entity& entity) = 0;
-    };
-
     struct Transform {
 
         void set_position(const float3& p) { position_ = p; dirty_ = true; }
@@ -57,25 +50,4 @@ namespace amyinorbit::gl {
         quaternion rotation_;
     };
 
-    struct RenderData {
-        Program program;
-        Tex2D texture;
-        VertexArray vao;
-        Buffer vbo;
-        int vertex_count;
-    };
-
-    struct Entity {
-        struct Descr {
-            std::string model;
-            std::string texture;
-            std::string vertex_shader;
-            std::string fragment_shader;
-        };
-
-        static constexpr int max_components = 16;
-        RenderData render;
-        Transform transform;
-        Component* components[max_components] = {nullptr};
-    };
 };
