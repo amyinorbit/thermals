@@ -18,13 +18,11 @@ namespace amyinorbit {
 
     void Scene3D::on_start(App& app) {
 
-        renderer_.init();
-
-        camera_.position = float3(0, 0, 10);
+        camera_.position = float3(0, 10, 5);
         camera_.target = float3(0, 0, 0);
-        camera_.fov = 30.f;
+        camera_.fov = 60;
 
-        light_.position = float3(0, 2, 2);
+        light_.position = float3(0, 0, 0);
         light_.color = float3(1);
 
         planet = ecs.create();
@@ -35,7 +33,7 @@ namespace amyinorbit {
         // Set up a framebuffer to render everything
 
         fbo_ = Framebuffer::create();
-        fbo_.bind();
+        fbo_.own().bind();
 
         auto depth = Renderbuffer::create();
         depth.own().bind();
@@ -52,11 +50,6 @@ namespace amyinorbit {
         color_.set_mag_filter(Tex2D::Filter::linear);
         color_.set_min_filter(Tex2D::Filter::linear);
         fbo_.attach_color(0, color_);
-
-
-        diagnose();
-        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "framebuffer incomplete\n";
         Framebuffer::unbind_all();
 
         const float2 quad[] = {
@@ -103,9 +96,10 @@ namespace amyinorbit {
     }
 
     void Scene3D::update(App &app) {
+        static float3 axis(.5f, 1.f, .5f);
         auto& t = ecs.get_component<Transform>(planet);
         t.set_position(2.f * float3(std::sin(app.time().total), 0, std::cos(app.time().total)));
-        t.set_rotation(quaternion::rotation(app.time().total * -2, float3(1)));
+        t.set_rotation(quaternion::rotation(app.time().total * -2, axis));
     }
 
     void Scene3D::render(App &app) {
@@ -114,15 +108,16 @@ namespace amyinorbit {
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ModelRenderer::Data render_data;
+        RenderData render_data;
         render_data.light = light_;
         render_data.camera = camera_;
         render_data.projection = projection();
         render_data.view = view();
+        render_data.resolution = float2(app.point_size().w, app.point_size().h);
 
         renderer_.render(render_data);
+        raymarcher_.render(render_data);
         Framebuffer::unbind_all();
-        //
 
         app.viewport(app.pixel_size());
         glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -137,7 +132,7 @@ namespace amyinorbit {
         quad_shader_.set_uniform("camera.target", camera_.target);
         quad_shader_.set_uniform("light.position", light_.position);
         quad_shader_.set_uniform("light.color", light_.color);
-        quad_shader_.set_uniform("resolution", float2(1024, 600));
+        quad_shader_.set_uniform("resolution", render_data.resolution);
         quad_shader_.set_uniform("tex", color_);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

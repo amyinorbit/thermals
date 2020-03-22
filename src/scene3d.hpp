@@ -12,6 +12,7 @@
 #include <ecs/world.hpp>
 #include "components.hpp"
 #include "model_renderer.hpp"
+#include "raymarcher.hpp"
 #include "assets_lib.hpp"
 #include <string>
 #include <vector>
@@ -24,7 +25,8 @@ namespace amyinorbit {
     class Scene3D : public App::Scene {
     public:
 
-        Scene3D(AssetsLib& assets) : assets_(assets), renderer_(assets, ecs) {}
+        Scene3D(App& app, AssetsLib& assets)
+            : assets_(assets), renderer_(assets, ecs), raymarcher_(assets) {}
         ~Scene3D();
 
         void on_start(App& app) override;
@@ -43,6 +45,7 @@ namespace amyinorbit {
         ecs::World ecs;
         AssetsLib& assets_;
         ModelRenderer renderer_;
+        RayMarcher raymarcher_;
         Light light_;
         Camera camera_{float3{0.f, 10.f, 10.f}, float3{0.f, 0.f, 0.f}, 60.f};
         ecs::Entity planet;

@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
     src/model_renderer.cpp
     src/obj_loader.cpp
     src/transform.cpp
+    src/raymarcher.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)

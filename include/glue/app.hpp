@@ -69,11 +69,11 @@ namespace amyinorbit::gl {
         template <
             typename T,
             typename... Args,
-            std::enable_if_t<std::is_constructible_v<T, Args...>>* = nullptr,
+            std::enable_if_t<std::is_constructible_v<T, App&, Args...>>* = nullptr,
             std::enable_if_t<std::is_base_of_v<Scene, T>>* = nullptr
         >
         void show(Args&&... args) {
-            show(new T(std::forward<Args>(args)...));
+            show(new T(*this, std::forward<Args>(args)...));
         }
 
         void run() {
@@ -121,7 +121,7 @@ namespace amyinorbit::gl {
     template <
         typename T,
         typename... Args,
-        std::enable_if_t<std::is_constructible_v<T, Args...>>* = nullptr,
+        std::enable_if_t<std::is_constructible_v<T, App&, Args...>>* = nullptr,
         std::enable_if_t<std::is_base_of_v<App::Scene, T>>* = nullptr
     >
     void app_main(const Window::Attrib& cfg, Args&&... args) {

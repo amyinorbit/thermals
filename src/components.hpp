@@ -12,10 +12,11 @@
 #include <apmath/matrix.hpp>
 #include <apmath/quaternion.hpp>
 #include <apmath/vector.hpp>
-#include "obj_loader.hpp"
 
-namespace amyinorbit::gl {
+namespace amyinorbit {
     using math::mat4;
+    using math::uint2;
+    using math::float2;
     using math::float3;
     using math::quaternion;
 
@@ -50,4 +51,22 @@ namespace amyinorbit::gl {
         quaternion rotation_;
     };
 
+    struct Light {
+        float3 position;
+        float3 color;
+    };
+
+    struct Camera {
+        float3 position;
+        float3 target;
+        float fov;
+    };
+
+    struct RenderData {
+        Camera camera;
+        Light light;
+        float2 resolution;
+        mat4 view;
+        mat4 projection;
+    };
 };

@@ -14,23 +14,28 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace amyinorbit::gl {
+namespace amyinorbit {
     using std::string;
     using std::unordered_map;
+    using gl::Tex2D;
+    using gl::Image;
+    using gl::Shader;
+    using gl::Mesh;
 
     class AssetsLib {
     public:
+
         AssetsLib(const std::string& root) : root_(root) {}
 
-        Tex2D texture(const std::string& path) {
-            Image img(root_ + "/textures/" + path);
+        gl::Tex2D texture(const std::string& path) {
+            gl::Image img(root_ + "/textures/" + path);
             if(!img.is_loaded()) throw std::runtime_error("cannot open texture file " + path);
-            auto tex = Tex2D::create();
+            auto tex = gl::Tex2D::create();
             tex.bind();
             tex.upload_data(img);
             tex.gen_mipmaps();
-            tex.set_mag_filter(Tex2D::Filter::linear);
-            tex.set_min_filter(Tex2D::Filter::nearest);
+            tex.set_mag_filter(gl::Tex2D::Filter::linear);
+            tex.set_min_filter(gl::Tex2D::Filter::nearest);
             tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
             return tex;
         }
@@ -55,7 +60,7 @@ namespace amyinorbit::gl {
             }
             std::ifstream file(root_ + "/models/" + path);
             if(!file.is_open()) throw std::runtime_error("cannot open model file " + path);
-            return meshes_[path] = load_object(file);
+            return meshes_[path] = gl::load_object(file);
         }
 
         void clear() {

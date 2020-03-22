@@ -15,6 +15,7 @@
 #include <apmath/matrix.hpp>
 #include "obj_loader.hpp"
 #include "assets_lib.hpp"
+#include "components.hpp"
 #include <cstddef>
 #include <string>
 #include <unordered_map>
@@ -22,17 +23,6 @@
 namespace amyinorbit {
     using math::float3;
     using math::matrix4;
-
-    struct Light {
-        float3 position;
-        float3 color;
-    };
-
-    struct Camera {
-        float3 position;
-        float3 target;
-        float fov;
-    };
 
     struct Model {
         std::uint32_t offset;
@@ -42,22 +32,11 @@ namespace amyinorbit {
 
     class ModelRenderer {
     public:
-
-        struct Data {
-            Camera camera;
-            Light light;
-            matrix4 view;
-            matrix4 projection;
-        };
-
-        ModelRenderer(gl::AssetsLib& assets, ecs::World& world)
-            : assets_(assets), ecs(world), offset_(0) {}
-
-        void init();
+        ModelRenderer(AssetsLib& assets, ecs::World& world);
         Model model(const std::string& path);
-        void render(const Data& data);
+        void render(const RenderData& data);
     private:
-        gl::AssetsLib& assets_;
+        AssetsLib& assets_;
         ecs::World& ecs;
         std::size_t offset_ = 0;
 

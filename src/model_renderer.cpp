@@ -12,7 +12,8 @@
 namespace amyinorbit {
     using namespace gl;
 
-    void ModelRenderer::init() {
+    ModelRenderer::ModelRenderer(AssetsLib& assets, ecs::World& world)
+    : assets_(assets), ecs(world), offset_(0) {
         vao_ = VertexArray::create();
         vao_.own().bind();
 
@@ -55,7 +56,7 @@ namespace amyinorbit {
         return m;
     }
 
-    void ModelRenderer::render(const Data& data) {
+    void ModelRenderer::render(const RenderData& data) {
         vao_.bind();
         shader_.use();
         shader_.set_uniform("camera.position", data.camera.position);
