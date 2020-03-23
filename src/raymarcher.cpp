@@ -17,7 +17,7 @@ namespace amyinorbit {
 
         vbo_ = Buffer::create(Buffer::vbo);
         vbo_.own().bind();
-
+        
         static const float quad[] = {
             -1, 1,
             1, -1,
@@ -29,18 +29,19 @@ namespace amyinorbit {
         vbo_.set_data(quad);
 
         shader_ = assets.shader("raymarch.vsh", "raymarch.fsh");
-        shader_.own().use();
+        shader_.own().bind();
 
         Shader::AttrDescr<float> position;
         position.count = 2;
         position.stride = 2;
         shader_.set_attrib_ptr(0, position);
         shader_.enable_attrib(0);
+        vao_.unbind();
     }
 
     void RayMarcher::render(const RenderData &data) {
         vao_.bind();
-        shader_.use();
+        shader_.bind();
 
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);

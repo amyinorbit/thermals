@@ -44,6 +44,8 @@ namespace amyinorbit::gl {
             vec<std::uint32_t, Dim> size;
         };
 
+        const char* name() { return "texture"; }
+
         enum class Wrap {
             repeat = GL_REPEAT,
             mirror = GL_MIRRORED_REPEAT,
@@ -65,7 +67,6 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
-            std::cerr << "destroying texture #" << Base::id() << "\n";
             GLuint name = Base::id();
             glDeleteTextures(1, &name);
         }
@@ -74,6 +75,10 @@ namespace amyinorbit::gl {
             tex_unit_ = unit;
             glActiveTexture(GL_TEXTURE0 + unit);
             glBindTexture(tex_enum<Dim>, Base::id());
+        }
+
+        void unbind() const {
+            glBindTexture(tex_enum<Dim>, 0);
         }
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>

@@ -14,6 +14,7 @@ namespace amyinorbit {
 
     ModelRenderer::ModelRenderer(AssetsLib& assets, ecs::World& world)
     : assets_(assets), ecs(world), offset_(0) {
+        std::cout << "[init] 3d model rendering module\n";
         vao_ = VertexArray::create();
         vao_.own().bind();
 
@@ -22,7 +23,7 @@ namespace amyinorbit {
         vbo_.allocate<float>(1024 * 1024);
 
         shader_ = assets_.shader("model.vsh", "model.fsh");
-        shader_.own().use();
+        shader_.own().bind();
         Shader::AttrDescr<float> position, normal, texcoord;
         position.offset = 0;
         position.count = 3;
@@ -42,14 +43,17 @@ namespace amyinorbit {
         shader_.enable_attrib(0);
         shader_.enable_attrib(1);
         shader_.enable_attrib(2);
+
+        vao_.unbind();
     }
 
     Model ModelRenderer::model(const std::string &path) {
         if(models_.count(path)) return models_.at(path);
 
         Model m;
-
         const auto& mesh = assets_.model(path);
+        // vao_.bind();
+        vbo_.bind();
         m.offset = offset_;
         m.vertices = vbo_.sub_data(m.offset, mesh.data);
         offset_ += m.vertices;
@@ -58,7 +62,7 @@ namespace amyinorbit {
 
     void ModelRenderer::render(const RenderData& data) {
         vao_.bind();
-        shader_.use();
+        shader_.bind();
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);
         shader_.set_uniform("light.position", data.light.position);
@@ -68,7 +72,7 @@ namespace amyinorbit {
         shader_.set_uniform("view", data.view);
 
         for(const auto& [model, transform]: ecs.with<Model, Transform>()) {
-            model.texture.bind();
+            if(model.texture) model.texture.bind();
             shader_.set_uniform("model", transform.transform());
             glDrawArrays(GL_TRIANGLES, model.offset, model.vertices);
         }

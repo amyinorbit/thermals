@@ -16,6 +16,10 @@
 namespace amyinorbit::gl {
     class VertexArray : public Handle<VertexArray> {
     public:
+        const char* name() { return "vertex array"; }
+
+        using Handle::bind;
+        using Handle::unbind;
 
         static VertexArray create() {
             VertexArray vao;
@@ -26,13 +30,12 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
-            std::cerr << "destroying vertex array #" << id() << "\n";
             GLuint name = id();
             glDeleteVertexArrays(1, &name);
         }
 
-        void bind() {
-            glBindVertexArray(id());
+        static void bind(int name) {
+            glBindVertexArray(name);
         }
     };
 }

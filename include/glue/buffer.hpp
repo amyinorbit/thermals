@@ -38,15 +38,19 @@ namespace amyinorbit::gl {
             return bo;
         }
 
+        const char* name() { return "buffer"; }
+
         void destroy() {
-            // abort();
-            std::cerr << "destroying buffer #" << id() << "\n";
             GLuint name = id();
             glDeleteBuffers(1, &name);
         }
 
-        void bind() {
+        void bind() const {
             glBindBuffer((GLenum)type_, id());
+        }
+
+        void unbind() const {
+            glBindBuffer((GLenum)type_, 0);
         }
 
         template <typename T>

@@ -10,6 +10,10 @@
 #include <cstdint>
 #include <cstdlib>
 
+#ifndef NDEBUG
+#include <iostream>
+#endif
+
 namespace amyinorbit::gl {
 
     template <typename D>
@@ -48,17 +52,28 @@ namespace amyinorbit::gl {
             cleanup();
         }
 
+        void bind() const {
+            D::bind(id_);
+        }
+
+        void unbind() const {
+            D::bind(0);
+        }
+
         D& reset(std::uint32_t id) {
             id_ = id;
             flags_ = valid_flag;
-            return static_cast<D&>(*this);
+            return impl();
         }
 
         D& own() {
             if(is_valid()) {
                 flags_ |= owned_flag;
             }
-            return static_cast<D&>(*this);
+            #ifndef NDEBUG
+            std::cerr << "[" << impl().name() << "]: owning #" << id_ << "\n";
+            #endif
+            return impl();
         }
 
         std::uint32_t id() const { return id_; }
@@ -77,9 +92,14 @@ namespace amyinorbit::gl {
         }
 
     private:
+        D& impl() { return static_cast<D&>(*this); }
+
         void cleanup() {
             if(!is_owned() || !is_valid()) return;
-            // abort();
+
+            #ifndef NDEBUG
+            std::cerr << "[" << impl().name() << "]: destroying #" << id_ << "\n";
+            #endif
             static_cast<D&>(*this).destroy();
         }
 

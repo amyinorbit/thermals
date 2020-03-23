@@ -29,13 +29,14 @@ namespace amyinorbit::gl {
             fragment = GL_FRAGMENT_SHADER
         };
 
+        const char* name() { return "shader stage"; }
+
         static Stage create(Type type) {
             Stage sh;
             return sh.reset(glCreateShader((GLenum)type));
         }
 
         void destroy() {
-            std::cerr << "destroying shader stage #" << id() << "\n";
             glDeleteShader(id());
         }
 
@@ -81,6 +82,10 @@ namespace amyinorbit::gl {
             bool normalize = false;
         };
 
+        using Handle::bind;
+        using Handle::unbind;
+        const char* name() { return "shader program"; }
+
         static Shader create(std::istream& vertex, std::istream& fragment) {
             Stage vs = Stage::create(Stage::vertex);
             vs.own();
@@ -98,8 +103,6 @@ namespace amyinorbit::gl {
             shader.attach(fs);
             if(!shader.link())
                 throw std::runtime_error("Error in shader: " + shader.debug_message());
-
-            std::cerr << "shader successfully compiked & linked\n";
             return shader;
         }
 
@@ -109,7 +112,6 @@ namespace amyinorbit::gl {
         }
 
         void destroy() {
-            std::cerr << "destroying shader program #" << id() << "\n";
             glDeleteProgram(id());
         }
 
@@ -162,8 +164,8 @@ namespace amyinorbit::gl {
             glUniform1i(loc, tex.tex_unit());
         }
 
-        void use() {
-            glUseProgram(id());
+        static void bind(int name) {
+            glUseProgram(name);
         }
 
         std::uint32_t get_uniform_loc(const string& name) const {

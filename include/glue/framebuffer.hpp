@@ -18,6 +18,9 @@ namespace amyinorbit::gl {
 
     class Renderbuffer : public Handle<Renderbuffer> {
     public:
+        using Handle::bind;
+        using Handle::unbind;
+        const char* name() { return "render buffer"; }
 
         static Renderbuffer create() {
             Renderbuffer rbo;
@@ -32,8 +35,7 @@ namespace amyinorbit::gl {
             glDeleteFramebuffers(1, &name);
         }
 
-        void bind() { glBindRenderbuffer(GL_RENDERBUFFER, id()); }
-        static void unbind_all() { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
+        static void bind(int name) { glBindRenderbuffer(GL_RENDERBUFFER, name); }
 
         void allocate(TexFormat format, const uint2& size) {
             glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(format), size.x, size.y);
@@ -43,6 +45,9 @@ namespace amyinorbit::gl {
 
     class Framebuffer  : public Handle<Framebuffer> {
     public:
+        using Handle::bind;
+        using Handle::unbind;
+        const char* name() { return "frame buffer"; }
 
         static Framebuffer create() {
             Framebuffer tex;
@@ -57,8 +62,7 @@ namespace amyinorbit::gl {
             glDeleteFramebuffers(1, &name);
         }
 
-        void bind() { glBindFramebuffer(GL_FRAMEBUFFER, id()); }
-        static void unbind_all() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+        static void bind(int name) { glBindFramebuffer(GL_FRAMEBUFFER, name); }
 
         Tex2D& color_attachment(int idx) { return colors_.at(idx); }
         const Tex2D& color_attachment(int idx) const { return colors_.at(idx); }
