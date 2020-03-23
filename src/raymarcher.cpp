@@ -15,9 +15,9 @@ namespace amyinorbit {
         vao_ = VertexArray::create();
         vao_.own().bind();
 
-        vbo_ = Buffer::create(Buffer::vbo);
+        vbo_ = Buffer::create(Buffer::array_buffer);
         vbo_.own().bind();
-        
+
         static const float quad[] = {
             -1, 1,
             1, -1,

@@ -17,11 +17,6 @@
 namespace amyinorbit::gl {
     using namespace math;
 
-    template <int D> constexpr GLenum tex_enum = GL_NONE;
-    template <> constexpr GLenum tex_enum<1> = GL_TEXTURE_1D;
-    template <> constexpr GLenum tex_enum<2> = GL_TEXTURE_2D;
-    template <> constexpr GLenum tex_enum<3> = GL_TEXTURE_3D;
-
     enum class TexFormat {
         red = GL_RED,
         rgb = GL_RGB,
@@ -66,6 +61,10 @@ namespace amyinorbit::gl {
             return tex;
         }
 
+        GLenum gl_type() const {
+            return tex_enum<Dim>;
+        }
+
         void destroy() {
             GLuint name = Base::id();
             glDeleteTextures(1, &name);
@@ -74,16 +73,16 @@ namespace amyinorbit::gl {
         void bind(int unit = 0) const {
             tex_unit_ = unit;
             glActiveTexture(GL_TEXTURE0 + unit);
-            glBindTexture(tex_enum<Dim>, Base::id());
+            glBindTexture(gl_type(), Base::id());
         }
 
         void unbind() const {
-            glBindTexture(tex_enum<Dim>, 0);
+            glBindTexture(gl_type(), 0);
         }
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>
         void allocate(const DataDescr<T>& descr) {
-            glTexImage2D(tex_enum<Dim>, 0,
+            glTexImage2D(gl_type(), 0,
                          static_cast<GLenum>(descr.dest_format),
                          descr.size.x, descr.size.y, 0,
                          static_cast<GLenum>(descr.source_format),
@@ -92,7 +91,7 @@ namespace amyinorbit::gl {
 
         template <typename T, int N = Dim, std::enable_if_t<N == 2>* = nullptr>
         void upload_data(const DataDescr<T>& descr, const T* data) {
-            glTexImage2D(tex_enum<Dim>, 0,
+            glTexImage2D(gl_type(), 0,
                          static_cast<GLenum>(descr.dest_format),
                          descr.size.x, descr.size.y, 0,
                          static_cast<GLenum>(descr.source_format),
@@ -101,7 +100,7 @@ namespace amyinorbit::gl {
 
         template <typename T, int N = Dim, std::enable_if_t<N == 3>* = nullptr>
         void upload_data(const DataDescr<T>& descr, const T* data) {
-            glTexImage3D(tex_enum<Dim>, 0,
+            glTexImage3D(gl_type(), 0,
                          static_cast<GLenum>(descr.dest_format),
                          descr.size.x, descr.size.y, descr.size.z, 0,
                          static_cast<GLenum>(descr.source_format),
@@ -113,7 +112,7 @@ namespace amyinorbit::gl {
                 std::cerr << "IMAGE NOT LOADED\n";
                 return;
             }
-            glTexImage2D(tex_enum<Dim>, 0,
+            glTexImage2D(gl_type(), 0,
                          img.format(),
                          img.size().x, img.size().y, 0,
                          img.format(),
@@ -139,14 +138,14 @@ namespace amyinorbit::gl {
         }
         void set_min_filter(Filter f) { set(GL_TEXTURE_MIN_FILTER, static_cast<int>(f)); }
         void set_mag_filter(Filter f) { set(GL_TEXTURE_MAG_FILTER, static_cast<int>(f)); }
-        void gen_mipmaps() { glGenerateMipmap(tex_enum<Dim>); }
+        void gen_mipmaps() { glGenerateMipmap(gl_type()); }
 
         int tex_unit() const { return tex_unit_;}
 
     private:
 
         void set(GLenum property, int value) {
-            glTexParameteri(tex_enum<Dim>, property, value);
+            glTexParameteri(gl_type(), property, value);
         }
 
         mutable int tex_unit_;

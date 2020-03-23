@@ -10,6 +10,11 @@
 using namespace amyinorbit;
 using namespace amyinorbit::gl;
 
+Context& GL() {
+    static Context ctx;
+    return ctx;
+}
+
 int main(int argc, const char** argv) {
 
     Window::Attrib config;

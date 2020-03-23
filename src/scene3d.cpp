@@ -67,7 +67,7 @@ namespace amyinorbit {
         quad_vao_ = VertexArray::create();
         quad_vao_.own().bind();
 
-        quad_vbo_ = Buffer::create(Buffer::vbo);
+        quad_vbo_ = Buffer::create(Buffer::array_buffer);
         quad_vbo_.own().bind();
         quad_vbo_.set_data(quad);
 

@@ -82,8 +82,6 @@ namespace amyinorbit::gl {
             bool normalize = false;
         };
 
-        using Handle::bind;
-        using Handle::unbind;
         const char* name() { return "shader program"; }
 
         static Shader create(std::istream& vertex, std::istream& fragment) {
@@ -164,9 +162,8 @@ namespace amyinorbit::gl {
             glUniform1i(loc, tex.tex_unit());
         }
 
-        static void bind(int name) {
-            glUseProgram(name);
-        }
+        void bind() const { glUseProgram(id()); }
+        void unbind() const { glUseProgram(0); }
 
         std::uint32_t get_uniform_loc(const string& name) const {
             auto it = uniforms_.find(name);

@@ -18,7 +18,7 @@ namespace amyinorbit {
         vao_ = VertexArray::create();
         vao_.own().bind();
 
-        vbo_ = Buffer::create(Buffer::vbo);
+        vbo_ = Buffer::create(Buffer::array_buffer);
         vbo_.own().bind();
         vbo_.allocate<float>(1024 * 1024);
 

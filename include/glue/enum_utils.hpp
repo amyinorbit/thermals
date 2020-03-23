@@ -19,4 +19,9 @@ namespace amyinorbit::gl {
     template <> constexpr GLenum as_enum<unsigned int>() { return GL_UNSIGNED_INT; }
     template <> constexpr GLenum as_enum<double>() { return GL_DOUBLE; }
     template <> constexpr GLenum as_enum<std::uint8_t>() { return GL_UNSIGNED_BYTE; }
+
+    template <int D> constexpr GLenum tex_enum = GL_NONE;
+    template <> constexpr GLenum tex_enum<1> = GL_TEXTURE_1D;
+    template <> constexpr GLenum tex_enum<2> = GL_TEXTURE_2D;
+    template <> constexpr GLenum tex_enum<3> = GL_TEXTURE_3D;
 }

@@ -62,8 +62,6 @@ namespace amyinorbit::gl {
         return m;
     }
 
-    constexpr struct strict_t {} strict;
-
     template <typename T>
     auto ass(T& target) {
         return [&](const T& value) {
@@ -118,7 +116,7 @@ namespace amyinorbit::gl {
 
         std::istringstream stream(in);
         auto elements = splitstring<'/'>(stream);
-        
+
         if(elements.empty() || elements.size() > 3) return nothing();
 
         integer(elements[0]) >> ass(indices[0]) << "invalid vertex index";

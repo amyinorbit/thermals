@@ -52,14 +52,6 @@ namespace amyinorbit::gl {
             cleanup();
         }
 
-        void bind() const {
-            D::bind(id_);
-        }
-
-        void unbind() const {
-            D::bind(0);
-        }
-
         D& reset(std::uint32_t id) {
             id_ = id;
             flags_ = valid_flag;

@@ -25,9 +25,23 @@ namespace amyinorbit::gl {
     public:
 
         enum Type {
-            vbo = GL_ARRAY_BUFFER,
-            ebo = GL_ELEMENT_ARRAY_BUFFER
+            array_buffer = 0,
+            element_buffer = 1,
+            uniform_buffer = 2
         };
+
+        int type_id() const {
+            return static_cast<int>(type_);
+        }
+
+        GLenum gl_type() const {
+            static const GLenum mappings[] = {
+                [Type::array_buffer] = GL_ARRAY_BUFFER,
+                [Type::element_buffer] = GL_ELEMENT_ARRAY_BUFFER,
+                [Type::uniform_buffer] = GL_UNIFORM_BUFFER
+            };
+            return mappings[type_];
+        }
 
         static Buffer create(Type type) {
             Buffer bo;
@@ -45,34 +59,29 @@ namespace amyinorbit::gl {
             glDeleteBuffers(1, &name);
         }
 
-        void bind() const {
-            glBindBuffer((GLenum)type_, id());
-        }
-
-        void unbind() const {
-            glBindBuffer((GLenum)type_, 0);
-        }
+        void bind() const { glBindBuffer(gl_type(), id()); }
+        void unbind() const { glBindBuffer(gl_type(), 0); }
 
         template <typename T>
         void allocate(std::size_t count, Usage usage = Usage::static_draw) {
-            glBufferData((GLenum)type_, count * sizeof(T), nullptr, static_cast<GLenum>(usage));
+            glBufferData(gl_type(), count * sizeof(T), nullptr, static_cast<GLenum>(usage));
         }
 
         template <typename T, std::size_t N>
         void set_data(const T (&data)[N], Usage usage = Usage::static_draw) {
-            glBufferData((GLenum)type_, N * sizeof(T), (void*)&data[0], static_cast<GLenum>(usage));
+            glBufferData(gl_type(), N * sizeof(T), (void*)&data[0], static_cast<GLenum>(usage));
         }
 
         template <typename T>
         void set_data(const std::vector<T>& data, Usage usage = Usage::static_draw) {
-            glBufferData((GLenum)type_, data.size() * sizeof(T), (void*)data.data(), static_cast<GLenum>(usage));
+            glBufferData(gl_type(), data.size() * sizeof(T), (void*)data.data(), static_cast<GLenum>(usage));
         }
 
         template <typename T, std::size_t N>
         std::size_t sub_data(std::size_t offset, const T (&data)[N]) {
             std::size_t size = N * sizeof(T);
             offset *= sizeof(T);
-            glBufferSubData((GLenum)type_, (GLintptr)offset, size, (void*)&data[0]);
+            glBufferSubData(gl_type(), (GLintptr)offset, size, (void*)&data[0]);
             return N;
         }
 
@@ -80,7 +89,7 @@ namespace amyinorbit::gl {
         std::size_t sub_data(std::size_t offset, const std::vector<T>& data) {
             std::size_t size = data.size() * sizeof(T);
             offset *= sizeof(T);
-            glBufferSubData((GLenum)type_, (GLintptr)offset, size, (void*)data.data());
+            glBufferSubData(gl_type(), (GLintptr)offset, size, (void*)data.data());
             return data.size();
         }
 
