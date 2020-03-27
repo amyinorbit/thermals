@@ -16,16 +16,16 @@
 #include <stdexcept>
 
 namespace amyinorbit::gl {
-    using math::float2;
-    using math::float3;
-    using math::float4;
-    using math::int3;
+    using apm::vec2;
+    using apm::vec3;
+    using apm::vec4;
+    using apm::ivec3;
     using std::string;
 
     struct Vertex {
-        float3 position;
-        float3 normal;
-        float2 tex;
+        vec3 position;
+        vec3 normal;
+        vec2 tex;
     };
 
     struct ParseError : public std::runtime_error {

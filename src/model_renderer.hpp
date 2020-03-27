@@ -21,8 +21,8 @@
 #include <unordered_map>
 
 namespace amyinorbit {
-    using math::float3;
-    using math::matrix4;
+    using apm::vec3;
+    using apm::matrix4;
 
     struct Model {
         std::uint32_t offset;

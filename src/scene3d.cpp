@@ -18,12 +18,12 @@ namespace amyinorbit {
 
     void Scene3D::on_start(App& app) {
         diagnose("start");
-        camera_.position = float3(0, 10, 5);
-        camera_.target = float3(0, 0, 0);
+        camera_.position = vec3(0, 10, 5);
+        camera_.target = vec3(0, 0, 0);
         camera_.fov = 60;
 
-        light_.position = float3(0, 0, 0);
-        light_.color = float3(1);
+        light_.position = vec3(0, 0, 0);
+        light_.color = vec3(1);
 
         planet = ecs.create();
 
@@ -53,14 +53,14 @@ namespace amyinorbit {
         fbo_.attach_color(0, color_);
         fbo_.unbind();
 
-        const float2 quad[] = {
-            float2(-1, 1), float2(0, 1),
-            float2(1, -1), float2(1, 0),
-            float2(1, 1), float2(1, 1),
+        const vec2 quad[] = {
+            vec2(-1, 1), vec2(0, 1),
+            vec2(1, -1), vec2(1, 0),
+            vec2(1, 1), vec2(1, 1),
 
-            float2(-1, +1), float2(0, 1),
-            float2(-1, -1), float2(0, 0),
-            float2(1, -1), float2(1, 0),
+            vec2(-1, +1), vec2(0, 1),
+            vec2(-1, -1), vec2(0, 0),
+            vec2(1, -1), vec2(1, 0),
         };
 
         // Finally, set up the pipeline we'll use to render the scene's quad
@@ -98,10 +98,10 @@ namespace amyinorbit {
 
     void Scene3D::update(App &app) {
         diagnose("update");
-        static float3 axis(.5f, 1.f, .5f);
+        static vec3 axis(.5f, 1.f, .5f);
         auto& t = ecs.get_component<Transform>(planet);
-        t.set_position(2.f * float3(std::sin(app.time().total), 0, std::cos(app.time().total)));
-        t.set_rotation(quaternion::rotation(app.time().total * -2, axis));
+        t.set_position(2.f * vec3(std::sin(app.time().total), 0, std::cos(app.time().total)));
+        t.set_rotation(apm::rotate(axis, app.time().total * -2));
     }
 
     void Scene3D::render(App &app) {
@@ -115,7 +115,7 @@ namespace amyinorbit {
         render_data.camera = camera_;
         render_data.projection = projection();
         render_data.view = view();
-        render_data.resolution = float2(app.point_size().w, app.point_size().h);
+        render_data.resolution = vec2(app.point_size().w, app.point_size().h);
 
         renderer_.render(render_data);
 

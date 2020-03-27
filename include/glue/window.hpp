@@ -16,13 +16,13 @@
 
 namespace amyinorbit::gl {
     using std::string;
-    using math::uint2;
+    using apm::uvec2;
 
 
     class Window {
     public:
         struct Attrib {
-            uint2 size;
+            uvec2 size;
             string name;
 
             struct {
@@ -63,10 +63,10 @@ namespace amyinorbit::gl {
             impl_ = nullptr;
         }
 
-        uint2 framebuffer_size() const {
+        uvec2 framebuffer_size() const {
             int width, height;
             glfwGetFramebufferSize(impl_, &width, &height);
-            return uint2(width, height);
+            return uvec2(width, height);
         }
 
     private:

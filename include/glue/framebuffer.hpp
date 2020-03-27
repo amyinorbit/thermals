@@ -36,7 +36,7 @@ namespace amyinorbit::gl {
         void bind() const { glBindRenderbuffer(GL_RENDERBUFFER, id()); }
         void unbind() const { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
 
-        void allocate(TexFormat format, const uint2& size) {
+        void allocate(TexFormat format, const uvec2& size) {
             glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(format), size.x, size.y);
         }
 

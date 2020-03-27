@@ -13,7 +13,7 @@
 #include "components.hpp"
 
 namespace amyinorbit {
-    using math::uint2;
+    using apm::uvec2;
 
     class RayMarcher {
     public:

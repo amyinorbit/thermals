@@ -19,7 +19,7 @@
 #include <unordered_map>
 
 namespace amyinorbit::gl {
-    using namespace math;
+    using namespace apm;
     using std::string;
 
     class Stage : public Handle<Stage> {
@@ -204,12 +204,12 @@ namespace amyinorbit::gl {
     }
 
     template <>
-    inline void Shader::set_uniform(int loc, const int3& v) {
+    inline void Shader::set_uniform(int loc, const ivec3& v) {
         glUniform3iv(loc, 1, v.data);
     }
 
     template <>
-    inline void Shader::set_uniform(int loc, const int4& v) {
+    inline void Shader::set_uniform(int loc, const ivec4& v) {
         glUniform4iv(loc, 1, v.data);
     }
 
@@ -220,17 +220,17 @@ namespace amyinorbit::gl {
     }
 
     template <>
-    inline void Shader::set_uniform(int loc, const float2& v) {
+    inline void Shader::set_uniform(int loc, const vec2& v) {
         glUniform2fv(loc, 1, v.data);
     }
 
     template <>
-    inline void Shader::set_uniform(int loc, const float3& v) {
+    inline void Shader::set_uniform(int loc, const vec3& v) {
         glUniform3fv(loc, 1, v.data);
     }
 
     template <>
-    inline void Shader::set_uniform(int loc, const float4& v) {
+    inline void Shader::set_uniform(int loc, const vec4& v) {
         glUniform4fv(loc, 1, v.data);
     }
 

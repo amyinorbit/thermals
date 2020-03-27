@@ -38,9 +38,9 @@ namespace amyinorbit::gl {
     }
 
     struct Loader {
-        std::vector<float3> vertices;
-        std::vector<float3> normals;
-        std::vector<float2> uvs;
+        std::vector<vec3> vertices;
+        std::vector<vec3> normals;
+        std::vector<vec2> uvs;
     };
 
     template <typename T, typename F>
@@ -111,8 +111,8 @@ namespace amyinorbit::gl {
         }
     }
 
-    maybe<int3> indices(std::string in) {
-        int3 indices(0);
+    maybe<ivec3> indices(std::string in) {
+        ivec3 indices(0);
 
         std::istringstream stream(in);
         auto elements = splitstring<'/'>(stream);
@@ -135,7 +135,7 @@ namespace amyinorbit::gl {
     }
 
     auto vertex(const Loader& loader) {
-        return [&](const int3& indices) -> maybe<Vertex> {
+        return [&](const ivec3& indices) -> maybe<Vertex> {
             Vertex v;
             if(!in_range(loader.vertices, indices[0])) return nothing();
             v.position = loader.vertices[indices[0]];
@@ -161,20 +161,20 @@ namespace amyinorbit::gl {
 
             shift(line)
             | of("v", [&]{
-                float3 v;
+                vec3 v;
                 (shift(line) >= floating) >> ass(v.x) << "missing vertex x coordinate";
                 (shift(line) >= floating) >> ass(v.y);
                 (shift(line) >= floating) >> ass(v.z);
                 loader.vertices.push_back(v);
             })
             | of("vt", [&]{
-                float2 v;
+                vec2 v;
                 (shift(line) >= floating) >> ass(v.x) << "missing texture u coordinate";
                 (shift(line) >= floating) >> ass(v.y);
                 loader.uvs.push_back(v);
             })
             | of("vn", [&]{
-                float3 v;
+                vec3 v;
                 (shift(line) >= floating) >> ass(v.x) << "missing normal x coordinate";
                 (shift(line) >= floating) >> ass(v.y);
                 (shift(line) >= floating) >> ass(v.z);

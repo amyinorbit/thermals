@@ -14,7 +14,7 @@
 #include <string>
 
 namespace amyinorbit::gl {
-    using namespace math;
+    using apm::ivec2;
     using std::string;
 
     struct Image {
@@ -26,12 +26,12 @@ namespace amyinorbit::gl {
 
         bool is_loaded() const { return data_ != nullptr; }
         const std::uint8_t* data() const { return data_; }
-        const int2& size() const { return size_; }
+        const ivec2& size() const { return size_; }
         int channels() const { return channels_; }
 
         GLenum format() const;
     private:
-        int2 size_ = {0, 0};
+        ivec2 size_ = {0, 0};
         int channels_ = 0;
         std::uint8_t* data_ = nullptr;
     };

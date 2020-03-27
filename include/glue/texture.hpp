@@ -15,7 +15,7 @@
 #include <apmath/vector.hpp>
 
 namespace amyinorbit::gl {
-    using namespace math;
+    using namespace apm;
 
     enum class TexFormat {
         red = GL_RED,

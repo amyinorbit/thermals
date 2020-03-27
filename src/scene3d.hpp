@@ -19,8 +19,8 @@
 
 namespace amyinorbit {
     using namespace amyinorbit::gl;
-    using math::float3;
-    using math::int2;
+    using apm::vec3;
+    using apm::int2;
 
     class Scene3D : public App::Scene {
     public:
@@ -35,11 +35,11 @@ namespace amyinorbit {
     private:
 
         mat4 projection() {
-            return math::perspective(math::radians(camera_.fov), 1024.f/600.f, 0.1f, 100.f);
+            return apm::perspective(apm::radians(camera_.fov), 1024.f/600.f, 0.1f, 100.f);
         }
 
         mat4 view() {
-            return math::look_at(camera_.position, camera_.target);
+            return apm::look_at(camera_.position, camera_.target, vec3(0, 1, 0));
         }
 
         ecs::World ecs;
@@ -47,7 +47,7 @@ namespace amyinorbit {
         ModelRenderer renderer_;
         RayMarcher raymarcher_;
         Light light_;
-        Camera camera_{float3{0.f, 10.f, 10.f}, float3{0.f, 0.f, 0.f}, 60.f};
+        Camera camera_{vec3{0.f, 10.f, 10.f}, vec3{0.f, 0.f, 0.f}, 60.f};
         ecs::Entity planet;
 
 

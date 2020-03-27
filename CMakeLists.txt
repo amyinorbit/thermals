@@ -10,7 +10,6 @@ add_executable(${PROJECT_NAME}
     src/scene3d.cpp
     src/model_renderer.cpp
     src/obj_loader.cpp
-    src/transform.cpp
     src/raymarcher.cpp
 )
 

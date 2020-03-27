@@ -97,12 +97,12 @@ namespace amyinorbit::gl {
             glfwPollEvents();
         }
 
-        void viewport(const uint2& size) {
+        void viewport(const uvec2& size) {
             glViewport(0, 0, size.w, size.h);
         }
 
-        const uint2& point_size() const { return size_.logical; }
-        const uint2& pixel_size() const { return size_.physical; }
+        const uvec2& point_size() const { return size_.logical; }
+        const uvec2& pixel_size() const { return size_.physical; }
 
         const Time& time() const { return time_; }
 
@@ -116,7 +116,7 @@ namespace amyinorbit::gl {
         double last_update_;
 
         struct {
-            math::uint2 physical, logical;
+            apm::uvec2 physical, logical;
         } size_;
     };
 
