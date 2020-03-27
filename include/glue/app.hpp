@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "window.hpp"
+#include "input.hpp"
 #include <functional>
 #include <type_traits>
 #include <memory>
@@ -105,6 +106,7 @@ namespace amyinorbit::gl {
         const uvec2& pixel_size() const { return size_.physical; }
 
         const Time& time() const { return time_; }
+        Input input() const { return Input(window_); }
 
         Window& window() { return window_; }
         const Window& window() const { return window_; }

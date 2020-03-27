@@ -4,7 +4,7 @@
 #include <fstream>
 #include "assets_lib.hpp"
 #include "obj_loader.hpp"
-#include "scene3d.hpp"
+#include "cloud_scene.hpp"
 
 using namespace amyinorbit;
 using namespace amyinorbit::gl;
@@ -23,7 +23,7 @@ int main(int argc, const char** argv) {
 
     try {
         AssetsLib assets("assets");
-        app_main<Scene3D>(config, std::ref(assets));
+        app_main<CloudScene>(config, std::ref(assets));
     } catch(std::exception& e) {
         std::cerr << "fatal error: " << e.what() << "\n";
         return -1;

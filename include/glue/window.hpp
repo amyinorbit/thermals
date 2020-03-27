@@ -69,6 +69,8 @@ namespace amyinorbit::gl {
             return uvec2(width, height);
         }
 
+        GLFWwindow* impl() const { return impl_; }
+
     private:
         GLFWwindow* impl_ = nullptr;
     };

@@ -8,11 +8,7 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <glue/glue.hpp>
-#include <apmath/vector.hpp>
-#include <ecs/world.hpp>
 #include "components.hpp"
-#include "model_renderer.hpp"
-#include "raymarcher.hpp"
 #include "assets_lib.hpp"
 #include <string>
 #include <vector>
@@ -25,13 +21,19 @@ namespace amyinorbit {
     class Scene3D : public App::Scene {
     public:
 
-        Scene3D(App& app, AssetsLib& assets)
-            : assets_(assets), renderer_(assets, ecs), raymarcher_(assets) {}
+        Scene3D(App& app, AssetsLib& assets);
         ~Scene3D();
 
-        void on_start(App& app) override;
-        void update(App& app) override;
+        void on_start(App& app) override {}
+        virtual void render_scene(App& app, const RenderData& data) {}
         void render(App& app) override;
+
+    protected:
+
+        AssetsLib& assets() { return assets_; }
+        Camera& camera() { return camera_; }
+        Light& light() { return light_; }
+
     private:
 
         mat4 projection() {
@@ -42,14 +44,9 @@ namespace amyinorbit {
             return apm::look_at(camera_.position, camera_.target, vec3(0, 1, 0));
         }
 
-        ecs::World ecs;
         AssetsLib& assets_;
-        ModelRenderer renderer_;
-        RayMarcher raymarcher_;
         Light light_;
         Camera camera_{vec3{0.f, 10.f, 10.f}, vec3{0.f, 0.f, 0.f}, 60.f};
-        ecs::Entity planet;
-
 
         Framebuffer fbo_;
         Tex2D color_;
