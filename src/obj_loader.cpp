@@ -63,7 +63,7 @@ namespace amyinorbit::gl {
     }
 
     template <typename T>
-    auto ass(T& target) {
+    auto assign(T& target) {
         return [&](const T& value) {
             target = value;
         };
@@ -119,7 +119,7 @@ namespace amyinorbit::gl {
 
         if(elements.empty() || elements.size() > 3) return nothing();
 
-        integer(elements[0]) >> ass(indices[0]) << "invalid vertex index";
+        integer(elements[0]) >> assign(indices[0]) << "invalid vertex index";
         if(elements.size() < 2) return indices;
 
         indices[1] = integer(elements[1]).join(0);
@@ -162,22 +162,22 @@ namespace amyinorbit::gl {
             shift(line)
             | of("v", [&]{
                 vec3 v;
-                (shift(line) >= floating) >> ass(v.x) << "missing vertex x coordinate";
-                (shift(line) >= floating) >> ass(v.y);
-                (shift(line) >= floating) >> ass(v.z);
+                (shift(line) >= floating) >> assign(v.x) << "missing vertex x coordinate";
+                (shift(line) >= floating) >> assign(v.y);
+                (shift(line) >= floating) >> assign(v.z);
                 loader.vertices.push_back(v);
             })
             | of("vt", [&]{
                 vec2 v;
-                (shift(line) >= floating) >> ass(v.x) << "missing texture u coordinate";
-                (shift(line) >= floating) >> ass(v.y);
+                (shift(line) >= floating) >> assign(v.x) << "missing texture u coordinate";
+                (shift(line) >= floating) >> assign(v.y);
                 loader.uvs.push_back(v);
             })
             | of("vn", [&]{
                 vec3 v;
-                (shift(line) >= floating) >> ass(v.x) << "missing normal x coordinate";
-                (shift(line) >= floating) >> ass(v.y);
-                (shift(line) >= floating) >> ass(v.z);
+                (shift(line) >= floating) >> assign(v.x) << "missing normal x coordinate";
+                (shift(line) >= floating) >> assign(v.y);
+                (shift(line) >= floating) >> assign(v.z);
                 loader.normals.push_back(v);
             })
             | of("f", [&]{
