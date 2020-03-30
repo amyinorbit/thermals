@@ -16,6 +16,7 @@
 namespace amyinorbit {
     using namespace amyinorbit::gl;
     using apm::vec3;
+    using apm::vec4;
     using apm::int2;
 
     class Scene3D : public App::Scene {
@@ -33,6 +34,7 @@ namespace amyinorbit {
         AssetsLib& assets() { return assets_; }
         Camera& camera() { return camera_; }
         Light& light() { return light_; }
+        vec4& background() { return background_; }
 
     private:
 
@@ -47,6 +49,8 @@ namespace amyinorbit {
         AssetsLib& assets_;
         Light light_;
         Camera camera_{vec3{0.f, 10.f, 10.f}, vec3{0.f, 0.f, 0.f}, 60.f};
+
+        vec4 background_;
 
         Framebuffer fbo_;
         Tex2D color_;

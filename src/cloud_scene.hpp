@@ -32,10 +32,10 @@ namespace amyinorbit {
         , models(assets, ecs) {
             camera().fov = 80.f;
             light().position = vec3(0, 2, 3);
+            background().rgb = vec3(0.529, 0.808, 0.922);
             model = ecs.create();
             ecs.add_component<Model>(model, models.model("planet.obj"));
-            auto& t = ecs.add_component<Transform>(model);
-            t.set_position({.5f, 0.f, 0.f});
+            ecs.add_component<Transform>(model);
         }
 
         void update(App& app) override {

@@ -84,7 +84,7 @@ namespace amyinorbit {
     void Scene3D::render(App &app) {
         fbo_.bind();
         app.viewport(app.point_size());
-        glClearColor(0.f, 0.f, 0.f, 1.f);
+        glClearColor(background_.r, background_.g, background_.b, background_.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         RenderData render_data;

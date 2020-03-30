@@ -28,7 +28,7 @@ namespace amyinorbit {
         };
         vbo_.set_data(quad);
 
-        shader_ = assets.shader("raymarch.vsh", "raymarch.fsh");
+        shader_ = assets.shader("raymarch.vert", "raymarch.frag");
         shader_.own().bind();
 
         Shader::AttrDescr<float> position;

@@ -26,9 +26,19 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform float time;
 
-float sdf(vec3 p) {
+
+float sdBox( vec3 p, vec3 b ) {
+  vec3 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
+float sdSphere(vec3 p) {
     vec3 center = vec3(0, 1, 0);
     return distance(p, center) - 1.2;
+}
+
+float scene(vec3 p) {
+    return sdBox(p, vec3(0.5, 1, 2));
 }
 
 #define STEPS 64
@@ -37,7 +47,7 @@ vec4 raymarch(vec3 origin, vec3 direction) {
     vec3 pos = origin;
     mat4 pv = projection * view;
     for(int i = 0; i < STEPS; ++i) {
-        float dist = sdf(pos);
+        float dist = scene(pos);
         if(dist < MIN_DISTANCE) {
             vec4 dv = pv * vec4(pos, 1);
             float depth = 0.5 * ((dv.z/dv.w) + 1.0);
@@ -46,11 +56,9 @@ vec4 raymarch(vec3 origin, vec3 direction) {
         }
         pos += dist * direction;
     }
-    discard;
+    return vec4(0);
 }
 
 void main() {
-    // fragColor = vec4(gl_FragDepth);
     fragColor = raymarch(ray.origin, ray.direction);
-    // fragColor = vec4(ray.direction, .5f);
 }

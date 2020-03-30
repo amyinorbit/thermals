@@ -17,7 +17,7 @@ out Ray ray;
 uniform Camera camera;
 uniform vec2 resolution;
 
-Ray cast(vec2 vert) {
+Ray castRay(vec2 vert) {
     float aspect = resolution.x / resolution.y;
     float tanHalfFov = tan(radians(camera.fov/2));
     vec3 forward = normalize(camera.target - camera.position);
@@ -33,5 +33,5 @@ Ray cast(vec2 vert) {
 
 void main() {
     gl_Position = vec4(i_position, 0, 1);
-    ray = cast(i_position);
+    ray = castRay(i_position);
 }
