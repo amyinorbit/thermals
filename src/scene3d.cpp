@@ -93,6 +93,7 @@ namespace amyinorbit {
         render_data.projection = projection();
         render_data.view = view();
         render_data.resolution = vec2(app.point_size().w, app.point_size().h);
+        render_data.time = app.time().total;
         render_scene(app, render_data);
         //
         // renderer_.render(render_data);

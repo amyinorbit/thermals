@@ -45,9 +45,13 @@ namespace amyinorbit {
 
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);
+        shader_.set_uniform("camera.fov", data.camera.fov);
         shader_.set_uniform("light.position", data.light.position);
         shader_.set_uniform("light.color", data.light.color);
         shader_.set_uniform("resolution", data.resolution);
+        shader_.set_uniform("projection", data.projection);
+        shader_.set_uniform("view", data.view);
+        shader_.set_uniform("time", data.time);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

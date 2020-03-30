@@ -30,10 +30,12 @@ namespace amyinorbit {
         : Scene3D(app, assets)
         , clouds(assets)
         , models(assets, ecs) {
-            light().position = vec3(0, 5, 5);
+            camera().fov = 80.f;
+            light().position = vec3(0, 2, 3);
             model = ecs.create();
             ecs.add_component<Model>(model, models.model("planet.obj"));
-            ecs.add_component<Transform>(model);
+            auto& t = ecs.add_component<Transform>(model);
+            t.set_position({.5f, 0.f, 0.f});
         }
 
         void update(App& app) override {

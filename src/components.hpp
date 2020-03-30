@@ -68,5 +68,7 @@ namespace amyinorbit {
         vec2 resolution;
         mat4 view;
         mat4 projection;
+
+        float time;
     };
 };
