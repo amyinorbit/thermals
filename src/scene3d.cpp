@@ -95,9 +95,7 @@ namespace amyinorbit {
         render_data.resolution = vec2(app.point_size().w, app.point_size().h);
         render_data.time = app.time().total;
         render_scene(app, render_data);
-        //
-        // renderer_.render(render_data);
-        // raymarcher_.render(render_data);
+
         fbo_.unbind();
         app.viewport(app.pixel_size());
         glClearColor(0.f, 0.f, 0.f, 1.f);

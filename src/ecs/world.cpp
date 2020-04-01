@@ -7,9 +7,12 @@
 // =^•.•^=
 //===--------------------------------------------------------------------------------------------===
 #include <ecs/world.hpp>
+#ifndef NDEBUG
+#include <iostream>
+#endif
 
 namespace amyinorbit::ecs {
-    
+
     Store::Store(std::size_t elt_size, std::size_t count) : elt_size_(elt_size), count_(count) {
         data_ = new byte[elt_size * count];
     }
@@ -55,13 +58,15 @@ namespace amyinorbit::ecs {
         if(free_list_.size()) {
             auto idx = free_list_.back();
             free_list_.pop_back();
+            std::cout << "Creating from free list: " << idx << "\n";
             return Entity{idx, versions_[idx]};
         }
-        assert(next_index_ < MAX_COMPONENTS);
+        assert(next_index_ < MAX_ENTITIES);
 
         auto id = next_index_++;
-        auto version = versions_[id];
-        return Entity{id, version};
+        versions_[id] = 1;
+        std::cout << "Creating new entity: " << id << "\n";
+        return Entity{id, versions_[id]};
     }
 
     void World::destroy(Entity entity) {

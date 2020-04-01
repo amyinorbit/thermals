@@ -39,7 +39,7 @@ namespace amyinorbit {
     private:
 
         mat4 projection() {
-            return apm::perspective(apm::radians(camera_.fov), 1024.f/600.f, 0.1f, 100.f);
+            return apm::perspective(apm::radians(camera_.fov), 1024.f/600.f, 0.1f, 1000.f);
         }
 
         mat4 view() {

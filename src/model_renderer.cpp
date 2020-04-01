@@ -12,6 +12,14 @@
 namespace amyinorbit {
     using namespace gl;
 
+    #define DIAG() diagnose(__PRETTY_FUNCTION__, __LINE__)
+
+    void diagnose(const char* func, int line) {
+        auto err = glGetError();
+        if(err == GL_NO_ERROR) return;
+        std::cerr << "error (" << func << ":" << line << "): " << err << "\n";
+    }
+
     ModelRenderer::ModelRenderer(AssetsLib& assets, ecs::World& world)
     : assets_(assets), ecs(world), offset_(0) {
         std::cout << "[init] 3d model rendering module\n";
@@ -52,17 +60,22 @@ namespace amyinorbit {
 
         Model m;
         const auto& mesh = assets_.model(path);
-        // vao_.bind();
+        vao_.bind();
+        DIAG();
         vbo_.bind();
         m.offset = offset_;
         m.vertices = vbo_.sub_data(m.offset, mesh.data);
+        DIAG();
         offset_ += m.vertices;
         return m;
     }
 
     void ModelRenderer::render(const RenderData& data) {
+        // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         vao_.bind();
+        DIAG();
         shader_.bind();
+        DIAG();
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);
         shader_.set_uniform("light.position", data.light.position);
@@ -72,9 +85,13 @@ namespace amyinorbit {
         shader_.set_uniform("view", data.view);
 
         for(const auto& [model, transform]: ecs.with<Model, Transform>()) {
-            if(model.texture) model.texture.bind();
+            // std::cout << "rendering model at " << model.offset << "/" << model.vertices<< "\n";
+            model.texture.bind();
+            DIAG();
             shader_.set_uniform("model", transform.transform());
+            shader_.set_uniform("blend", model.texture_blend);
             glDrawArrays(GL_TRIANGLES, model.offset, model.vertices);
+            DIAG();
         }
     }
 }

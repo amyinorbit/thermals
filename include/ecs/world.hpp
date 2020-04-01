@@ -17,7 +17,7 @@
 #include <ecs/proxy.hpp>
 #include <ecs/view.hpp>
 
-#define MAX_ENTITIES 64
+#define MAX_ENTITIES 128
 #define MAX_COMPONENTS 16
 
 namespace amyinorbit::ecs {

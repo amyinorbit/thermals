@@ -28,6 +28,7 @@ namespace amyinorbit {
         std::uint32_t offset;
         std::uint32_t vertices;
         gl::Tex2D texture;
+        float texture_blend = 0.f;
     };
 
     class ModelRenderer {
