@@ -33,9 +33,5 @@ void main() {
 
     vec4 solidColor = vec4(1);
     vec4 color = mix(solidColor, texture(tex, texCoord), blend);
-
-    // fragColor = texture(tex, texCoord);
-    // vec4 color = vec4(normal, 1.f);
-    // fragColor = vec4(normal, 1.f);
-    fragColor = vec4(ambiant + diffuse, 1.f) * color;
+    fragColor = color * vec4(ambiant + diffuse, 1);
 }

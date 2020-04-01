@@ -2,8 +2,7 @@
 #include <apmath/vector.hpp>
 #include <iostream>
 #include <fstream>
-#include "assets_lib.hpp"
-#include "obj_loader.hpp"
+#include "engine/assets_lib.hpp"
 #include "cloud_scene.hpp"
 
 using namespace amyinorbit;

@@ -5,12 +5,12 @@ add_executable(${PROJECT_NAME}
     src/ecs/entity.cpp
     src/ecs/world.cpp
     src/main.cpp
-    src/image.cpp
     src/SimplexNoise.cpp
-    src/scene3d.cpp
-    src/model_renderer.cpp
-    src/obj_loader.cpp
-    src/raymarcher.cpp
+    src/engine/image.cpp
+    src/engine/scene3d.cpp
+    src/engine/model_renderer.cpp
+    src/engine/obj_loader.cpp
+    src/engine/raymarcher.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)

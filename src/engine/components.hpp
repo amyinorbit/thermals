@@ -23,12 +23,21 @@ namespace amyinorbit {
     struct Transform {
 
         void set_position(const vec3& p) { position_ = p; dirty_ = true; }
+        void set_position(float x, float y, float z) { set_position(vec3(x,y,z)); }
+
         void set_rotation(const quaternion& r) { rotation_ = r; dirty_ = true; }
+
         void set_scale(const vec3& s) { scale_ = s; dirty_ = true; }
+        void set_scale(float x, float y, float z) { set_scale(vec3(x,y,z)); }
+        void set_scale(float s) { set_scale(vec3(s)); }
 
         void translate(const vec3& d) { position_ += d; dirty_ = true; }
         void rotate(const quaternion& q) { rotation_ *= q; dirty_ = true; }
         void scale(const vec3& s) { scale_ *= s; dirty_ = true; }
+
+        vec3 forward() const {
+            return apm::rotate(apm::forward<float>, rotation_);
+        }
 
         const vec3& position() const { return position_; }
         const vec3& scale() const { return scale_; }

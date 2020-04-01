@@ -32,17 +32,17 @@ float sdBox( vec3 p, vec3 b ) {
   return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
-float sdSphere(vec3 p) {
-    vec3 center = vec3(0, 1, 0);
-    return distance(p, center) - 1.2;
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return distance(p, center) - radius;
 }
 
 float scene(vec3 p) {
-    return sdBox(p, vec3(0.5, 1, 2));
+    float sun = sdSphere(p, light.position, 10);
+    return sun;
 }
 
 #define STEPS 64
-#define MIN_DISTANCE 0.0001
+#define MIN_DISTANCE 0.01
 vec4 raymarch(vec3 origin, vec3 direction) {
     vec3 pos = origin;
     mat4 pv = projection * view;

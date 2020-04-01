@@ -8,9 +8,9 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <ecs/world.hpp>
-#include "scene3d.hpp"
-#include "model_renderer.hpp"
-#include "raymarcher.hpp"
+#include "engine/scene3d.hpp"
+#include "engine/model_renderer.hpp"
+#include "engine/raymarcher.hpp"
 
 namespace amyinorbit {
     using ecs::Entity;
@@ -18,16 +18,11 @@ namespace amyinorbit {
 
     inline vec3 cartesian(const vec3& s) {
         return vec3(
-            s[2] * std::cos(s[1]) * std::cos(s[0]),
+            s[2] * std::cos(s[1]) * std::sin(s[0]),
             s[2] * std::sin(s[1]),
-            s[2] * std::cos(s[1]) * std::sin(s[0])
+            s[2] * std::cos(s[1]) * std::cos(s[0])
         );
     }
-
-    struct Physics {
-        float mass;
-        vec3 velocity;
-    };
 
     class CloudScene : public Scene3D {
     public:
@@ -38,7 +33,7 @@ namespace amyinorbit {
             camera().target = vec3(0, 0, 0);
             camera().position = vec3(0, 0, 0);
             camera().fov = 60.f;
-            light().position = vec3(200, 500, 200);
+            light().position = vec3(100, 200, 100);
             background().rgb = vec3(0.529, 0.808, 0.922);
             //
             //
@@ -47,13 +42,9 @@ namespace amyinorbit {
                 auto& m = ecs.add_component<Model>(paper_plane, models.model("paper_plane.obj"));
                 m.texture_blend = 0.f;
                 auto& t = ecs.add_component<Transform>(paper_plane);
-                t.set_position(vec3(0, 50, 0));
+                t.set_position(0, 5, 0);
                 camera().target = t.position();
-
-                auto& physics = ecs.add_component<Physics>(paper_plane, 1.f, vec3());
             }
-
-
 
             {
                 ground = ecs.create();
@@ -62,7 +53,7 @@ namespace amyinorbit {
                 m.texture.own();
                 m.texture_blend = 1.f;
                 auto& t = ecs.add_component<Transform>(ground);
-                t.set_scale(vec3(1000));
+                t.set_scale(100);
             }
 
         }
@@ -78,9 +69,9 @@ namespace amyinorbit {
             auto el_speed = app.time().delta * apm::radians(90.f);
 
             if(in.down(Key::left)) {
-                cam_pos[0] += az_speed;
-            } else if(in.down(Key::right)) {
                 cam_pos[0] -= az_speed;
+            } else if(in.down(Key::right)) {
+                cam_pos[0] += az_speed;
             }
 
             if(in.down(Key::up)) {
@@ -104,6 +95,6 @@ namespace amyinorbit {
         ModelRenderer models;
 
         Entity ground, paper_plane;
-        vec3 cam_pos = {0.f, 0.f, 5.f};
+        vec3 cam_pos = {0.f, 0.f, 0.3};
     };
 }
