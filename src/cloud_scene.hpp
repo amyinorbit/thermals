@@ -88,8 +88,8 @@ namespace amyinorbit {
                 plane.rotate(apm::rotate(apm::up<float>, -yaw_speed));
             }
 
-            plane.translate(-f_speed * plane.forward());
-            camera().position = plane.position() + 0.5 * plane.forward();
+            plane.translate(f_speed * plane.forward());
+            camera().position = plane.position() - 0.5 * plane.forward();
             camera().target=  plane.position();
         }
 
