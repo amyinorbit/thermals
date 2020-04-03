@@ -23,6 +23,7 @@ namespace amyinorbit::gl {
         bgr = GL_BGR,
         rgba = GL_RGBA,
         argb = GL_BGRA,
+        alpha = GL_ALPHA,
         depth24_stencil8 = GL_DEPTH24_STENCIL8,
         depth_component = GL_DEPTH_COMPONENT,
         depth_stencil = GL_DEPTH_STENCIL,
@@ -105,6 +106,11 @@ namespace amyinorbit::gl {
                          descr.size.x, descr.size.y, descr.size.z, 0,
                          static_cast<GLenum>(descr.source_format),
                          as_enum<T>(), data);
+                         
+            auto r = glGetError();
+            if(r != GL_NO_ERROR) {
+                std::cerr << "error: " << r << "\n";
+            }
         }
 
         void upload_data(const Image& img) {
@@ -130,7 +136,7 @@ namespace amyinorbit::gl {
             set(GL_TEXTURE_WRAP_T, static_cast<int>(y));
         }
 
-        template <int N = Dim, std::enable_if_t<N == 2>* = nullptr>
+        template <int N = Dim, std::enable_if_t<N == 3>* = nullptr>
         void set_wrap(Wrap s, Wrap t, Wrap r) {
             set(GL_TEXTURE_WRAP_S, static_cast<int>(s));
             set(GL_TEXTURE_WRAP_T, static_cast<int>(t));

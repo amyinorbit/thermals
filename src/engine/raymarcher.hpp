@@ -15,8 +15,11 @@
 namespace amyinorbit {
     using apm::uvec2;
 
+
     class RayMarcher {
     public:
+        static constexpr apm::uvec3 grid = apm::uvec3(64);
+
         RayMarcher(AssetsLib& assets);
 
         void render(const RenderData& data);
@@ -24,5 +27,9 @@ namespace amyinorbit {
         gl::VertexArray vao_;
         gl::Buffer vbo_;
         gl::Shader shader_;
+
+        gl::Tex3D noise_;
+        gl::Tex2D clouds_;
+        // float noise_[grid.x * grid.y * grid.z];
     };
 }

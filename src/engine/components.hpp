@@ -32,11 +32,19 @@ namespace amyinorbit {
         void set_scale(float s) { set_scale(vec3(s)); }
 
         void translate(const vec3& d) { position_ += d; dirty_ = true; }
-        void rotate(const quaternion& q) { rotation_ *= q; dirty_ = true; }
+        void rotate(const quaternion& q) { rotation_ = q * rotation_; dirty_ = true; }
         void scale(const vec3& s) { scale_ *= s; dirty_ = true; }
 
         vec3 forward() const {
             return apm::rotate(apm::forward<float>, rotation_);
+        }
+
+        vec3 up() const {
+            return apm::rotate(apm::up<float>, rotation_);
+        }
+
+        vec3 right() const {
+            return apm::rotate(apm::right<float>, rotation_);
         }
 
         const vec3& position() const { return position_; }

@@ -5,7 +5,7 @@ add_executable(${PROJECT_NAME}
     src/ecs/entity.cpp
     src/ecs/world.cpp
     src/main.cpp
-    src/SimplexNoise.cpp
+    src/engine/SimplexNoise.cpp
     src/engine/image.cpp
     src/engine/scene3d.cpp
     src/engine/model_renderer.cpp

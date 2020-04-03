@@ -19,7 +19,7 @@ uniform vec2 resolution;
 
 Ray castRay(vec2 vert) {
     float aspect = resolution.x / resolution.y;
-    float tanHalfFov = tan(radians(camera.fov/2));
+    float tanHalfFov = tan(radians(camera.fov)/2);
     vec3 forward = normalize(camera.target - camera.position);
     vec3 up = vec3(0, 1, 0);
     vec3 right = normalize(cross(forward, up));

@@ -37,11 +37,11 @@ float sdSphere(vec3 p, vec3 center, float radius) {
 }
 
 float scene(vec3 p) {
-    float sun = sdSphere(p, light.position, 10);
+    float sun = sdSphere(p, light.position, 3);
     return sun;
 }
 
-#define STEPS 64
+#define STEPS 16
 #define MIN_DISTANCE 0.01
 vec4 raymarch(vec3 origin, vec3 direction) {
     vec3 pos = origin;

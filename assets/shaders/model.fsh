@@ -28,7 +28,10 @@ void main() {
 
     vec3 lightDir = normalize(light.position - fragPos);
 
-    vec3 diffuse = max(dot(lightDir, norm), 0.f) * light.color;
+    float illum = dot(lightDir, norm);
+    if(illum < 0.f) illum *= -0.6; // this allows a cheap "subsurface scattering-ish" effect
+
+    vec3 diffuse = illum * light.color;
     vec3 ambiant = 0.3f * light.color;
 
     vec4 solidColor = vec4(1);

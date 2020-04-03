@@ -11,6 +11,13 @@
 #include "engine/scene3d.hpp"
 #include "engine/model_renderer.hpp"
 #include "engine/raymarcher.hpp"
+#include "color.hpp"
+
+static void print_loc(const char* fn, int l) {
+    std::cerr << "trace: " << fn << " (" << l << ")\n";
+}
+
+#define TRACE() print_loc(__PRETTY_FUNCTION__, __LINE__)
 
 namespace amyinorbit {
     using ecs::Entity;
@@ -30,30 +37,28 @@ namespace amyinorbit {
         : Scene3D(app, assets)
         , clouds(assets)
         , models(assets, ecs) {
-            camera().target = vec3(0, 0, 0);
-            camera().position = vec3(0, 0, 0);
             camera().fov = 60.f;
-            light().position = vec3(100, 200, 100);
-            background().rgb = vec3(0.529, 0.808, 0.922);
-            //
-            //
+            light().position = vec3(10, 20, 10);
+            background().rgb = color::hsv(200, 0.3, 0.9);
+            TRACE();
             {
                 paper_plane = ecs.create();
-                auto& m = ecs.add_component<Model>(paper_plane, models.model("paper_plane.obj"));
+                auto& m = ecs.add_component<Model>(paper_plane, models.model("paper_plane_nowalls.obj"));
+                TRACE();
                 m.texture_blend = 0.f;
                 auto& t = ecs.add_component<Transform>(paper_plane);
-                t.set_position(0, 5, 0);
+                t.set_position(0, 10, 0);
                 camera().target = t.position();
             }
-
+            TRACE();
             {
                 ground = ecs.create();
-                auto& m = ecs.add_component<Model>(ground, models.model("plane.obj"));
+                auto& m = ecs.add_component<Model>(ground, models.model("ground.obj"));
                 m.texture = assets.texture("tex.png");
                 m.texture.own();
                 m.texture_blend = 1.f;
                 auto& t = ecs.add_component<Transform>(ground);
-                t.set_scale(100);
+                t.set_scale(vec3(100, 80, 100));
             }
 
         }
@@ -65,24 +70,27 @@ namespace amyinorbit {
 
         void update(App& app) override {
             auto in = app.input();
-            auto az_speed = app.time().delta * apm::radians(90.f);
-            auto el_speed = app.time().delta * apm::radians(90.f);
+            auto& plane = ecs.get_component<Transform>(paper_plane);
 
-            if(in.down(Key::left)) {
-                cam_pos[0] -= az_speed;
-            } else if(in.down(Key::right)) {
-                cam_pos[0] += az_speed;
-            }
+            float f_speed = 2 * app.time().delta;
+
+            float pitch_speed = apm::radians(90.f) * app.time().delta;
+            float yaw_speed = apm::radians(45.f) * app.time().delta;
 
             if(in.down(Key::up)) {
-                cam_pos[1] += el_speed;
+                plane.rotate(apm::rotate(plane.right(), -pitch_speed));
             } else if(in.down(Key::down)) {
-                cam_pos[1] -= el_speed;
+                plane.rotate(apm::rotate(plane.right(), pitch_speed));
+            }
+            if(in.down(Key::left)) {
+                plane.rotate(apm::rotate(apm::up<float>, yaw_speed));
+            } else if(in.down(Key::right)) {
+                plane.rotate(apm::rotate(apm::up<float>, -yaw_speed));
             }
 
-            cam_pos[1] = apm::clamp(cam_pos[1], -apm::radians(80.f), apm::radians(80.f));
-            camera().position = cartesian(cam_pos)
-                              + ecs.get_component<Transform>(paper_plane).position();
+            plane.translate(-f_speed * plane.forward());
+            camera().position = plane.position() + 0.5 * plane.forward();
+            camera().target=  plane.position();
         }
 
         void render_scene(App& app, const RenderData& rd) override {
@@ -95,6 +103,5 @@ namespace amyinorbit {
         ModelRenderer models;
 
         Entity ground, paper_plane;
-        vec3 cam_pos = {0.f, 0.f, 0.3};
     };
 }

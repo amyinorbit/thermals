@@ -7,6 +7,7 @@
 // =^•.•^=
 //===--------------------------------------------------------------------------------------------===
 #include "raymarcher.hpp"
+#include "noise.hpp"
 
 namespace amyinorbit {
     using namespace gl;
@@ -28,7 +29,7 @@ namespace amyinorbit {
         };
         vbo_.set_data(quad);
 
-        shader_ = assets.shader("raymarch.vert", "raymarch.frag");
+        shader_ = assets.shader("raymarch.vert", "clouds.frag");
         shader_.own().bind();
 
         Shader::AttrDescr<float> position;
@@ -37,12 +38,22 @@ namespace amyinorbit {
         shader_.set_attrib_ptr(0, position);
         shader_.enable_attrib(0);
         vao_.unbind();
+
+        noise_ = Noise::noise(grid, apm::vec3(100.f), 2.f);
+        noise_.own();
+
+        clouds_ = Noise::noise(apm::uvec2(1024, 1024), apm::vec2(100.f), 0.1f);
+        clouds_.own();
     }
 
     void RayMarcher::render(const RenderData &data) {
         vao_.bind();
         shader_.bind();
+        noise_.bind(0);
+        clouds_.bind(1);
 
+        shader_.set_uniform("noise", noise_);
+        shader_.set_uniform("clouds", clouds_);
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);
         shader_.set_uniform("camera.fov", data.camera.fov);

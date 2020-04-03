@@ -2,3 +2,7 @@ https://shaderbits.com/blog/creating-volumetric-ray-marcher
 |_https://www.shadertoy.com/view/WslGWl
 
 https://medium.com/dotcrossdot/raymarching-simulating-a-black-hole-53624a3684d3
+
+
+https://mewo2.com/notes/terrain/
+|_ cute random terrain generator
