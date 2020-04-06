@@ -47,18 +47,22 @@ float bubble(vec2 pos) {
 // "basic" density function. We use the coverage map, along with a height barrier,
 // and the "carve out" with the 3d noise texture (see Nubis papers)
 float density(vec3 p) {
-    vec3 texcoord = (p / 200.f) + vec3(0.5);
+    vec3 texcoord = (p / 200.f) + vec3(1.5);
     // For debug, let's just make one big ol' circular cloud
-    float h = height(p.y, 18, 1.5);
+    float h = height(p.y, 25, 3);
     float noiseValue = texture(noise, texcoord.xzy * 3).r;
     float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.3f, 1.f, 0.f, 1.f);
     return coverageValue * noiseValue * h;
 }
 
 #define MAX_STEPS 64
-#define STEP_SIZE 2.f
 #define EPSILON 1e-3
-#define TAU 1.f
+#define TAU 10.f
+
+// We use these to have a ramp, the closer to the camera we are, the more precise we
+// want to be with our sampling. At least I hope.
+#define START_STEP 0.01f
+#define END_STEP 5.f
 
 float beerLambert(float density, float distance) {
     return exp(-TAU * density * distance);
@@ -66,20 +70,17 @@ float beerLambert(float density, float distance) {
 
 vec4 raymarch(vec3 origin, vec3 direction) {
 
-    vec3 pos = origin;
+    vec3 pos = origin + EPSILON * direction;
     float trans = 1.f;
     bool hit = false;
-    float stepSize = STEP_SIZE;
+    float stepSize = START_STEP;
 
     for(int i = 0; i < MAX_STEPS; ++i) {
         float dt = beerLambert(density(pos), stepSize);
+        stepSize = mix(START_STEP, END_STEP, float(i)/float(MAX_STEPS));
 
         if(!hit && (1-dt) > EPSILON) {
             hit = true;
-            // pos -= STEP_SIZE * direction;
-            // stepSize /= 5.f;
-            // float dt = beerLambert(density(pos), stepSize);
-
             mat4 pv = projection * view;
             vec4 dv = pv * vec4(pos, 1);
             gl_FragDepth = 0.5 * ((dv.z/dv.w) + 1.0);
