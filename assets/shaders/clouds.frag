@@ -41,23 +41,26 @@ float height(float y, float alt, float dev) {
 
 float bubble(vec2 pos) {
     float d = distance(pos, vec2(5, -10));
-    return exp(- pow(d, 2.f) / (2.f * pow(2.f, 2.f)));
+    if(d < 5.f) return 1.f;
+    return 0.f;
+    // return exp(- pow(d, 2.f) / (2.f * pow(2.f, 2.f)));
 }
 
 // "basic" density function. We use the coverage map, along with a height barrier,
 // and the "carve out" with the 3d noise texture (see Nubis papers)
 float density(vec3 p) {
-    vec3 texcoord = (p / 200.f) + vec3(1.5);
-    // For debug, let's just make one big ol' circular cloud
+    vec3 texcoord = (p / 200.f) + vec3(0.5);
+
     float h = height(p.y, 25, 3);
-    float noiseValue = texture(noise, texcoord.xzy * 3).r;
-    float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.3f, 1.f, 0.f, 1.f);
-    return coverageValue * noiseValue * h;
+    float noiseValue = texture(noise, texcoord.xzy * 5).r;
+    float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.f, 1.f, 0.f, 1.f);
+
+    return remap(noiseValue, coverageValue, 1.f, 0.f, 1.f) * h;
 }
 
 #define MAX_STEPS 64
 #define EPSILON 1e-3
-#define TAU 10.f
+#define TAU 1.f
 
 // We use these to have a ramp, the closer to the camera we are, the more precise we
 // want to be with our sampling. At least I hope.

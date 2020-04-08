@@ -17,7 +17,7 @@ int main(int argc, const char** argv) {
 
     Window::Attrib config;
     config.name = "Thermals";
-    config.size = {1024, 600};
+    config.size = {1280, 720};
     config.version = {4, 1};
 
     try {

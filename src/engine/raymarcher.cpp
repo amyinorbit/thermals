@@ -39,10 +39,10 @@ namespace amyinorbit {
         shader_.enable_attrib(0);
         vao_.unbind();
 
-        noise_ = Noise::noise(grid, apm::vec3(100.f), 2.f);
+        noise_ = Noise::p_worley(grid, apm::vec3(100.f), 5.f);
         noise_.own();
 
-        clouds_ = Noise::noise(apm::uvec2(1024, 1024), apm::vec2(100.f), 0.1f);
+        clouds_ = Noise::perlin(apm::uvec2(1024, 1024), apm::vec2(100.f), 0.1f);
         clouds_.own();
     }
 
