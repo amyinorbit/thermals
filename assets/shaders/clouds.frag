@@ -16,9 +16,12 @@ struct Ray {
     vec3 direction;
 };
 
+in vec2 texCoord;
 in Ray ray;
 out vec4 fragColor;
 
+uniform sampler2D color;
+uniform sampler2D depth;
 uniform sampler3D noise;
 uniform sampler2D clouds;
 
@@ -28,8 +31,6 @@ uniform vec2 resolution;
 uniform mat4 projection;
 uniform mat4 view;
 uniform float time;
-
-
 
 float remap(float x, float i_min, float i_max, float o_min, float o_max) {
     return o_min + (x - i_min)*(o_max-o_min)/(i_max-i_min);
@@ -60,7 +61,7 @@ float density(vec3 p) {
 
 #define MAX_STEPS 64
 #define EPSILON 1e-3
-#define TAU 1.f
+#define TAU 10.f
 
 // We use these to have a ramp, the closer to the camera we are, the more precise we
 // want to be with our sampling. At least I hope.
@@ -71,31 +72,30 @@ float beerLambert(float density, float distance) {
     return exp(-TAU * density * distance);
 }
 
-vec4 raymarch(vec3 origin, vec3 direction) {
+float cloudOpacity(vec3 origin, vec3 direction, float sceneDepth) {
 
     vec3 pos = origin + EPSILON * direction;
     float trans = 1.f;
-    bool hit = false;
     float stepSize = START_STEP;
+    mat4 pv = projection * view;
 
     for(int i = 0; i < MAX_STEPS; ++i) {
         float dt = beerLambert(density(pos), stepSize);
         stepSize = mix(START_STEP, END_STEP, float(i)/float(MAX_STEPS));
 
-        if(!hit && (1-dt) > EPSILON) {
-            hit = true;
-            mat4 pv = projection * view;
-            vec4 dv = pv * vec4(pos, 1);
-            gl_FragDepth = 0.5 * ((dv.z/dv.w) + 1.0);
-        }
-
         trans *= dt;
         if(trans < EPSILON) break;
+        vec4 dv = pv * vec4(pos, 1);
+        float curDepth = 0.5 * ((dv.z/dv.w) + 1.0);
+        if(curDepth > sceneDepth) break;
         pos += stepSize * direction;
     }
-    return vec4(1, 1, 1, 1-trans);
+    return clamp(1-trans, 0, 1);
 }
 
 void main() {
-    fragColor = raymarch(ray.origin, ray.direction);
+    vec3 sceneColor = texture(color, texCoord).rgb;
+    float opacity = cloudOpacity(ray.origin, ray.direction, texture(depth, texCoord).r);
+    vec3 total = mix(sceneColor, vec3(1), opacity);
+    fragColor = vec4(total, 1);
 }

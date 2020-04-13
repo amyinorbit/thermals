@@ -101,15 +101,18 @@ namespace amyinorbit {
 
         quad_vao_.bind();
         quad_shader_.bind();
-        fbo_.color_attachment(0).bind(0);
-        fbo_.depth_attachment().bind(1);
+        fbo_.color_attachment(0).bind(fx_texture_color);
+        fbo_.depth_attachment().bind(fx_texture_depth);
 
         quad_shader_.set_uniform("camera.position", camera_.position);
         quad_shader_.set_uniform("camera.target", camera_.target);
+        quad_shader_.set_uniform("camera.fov", camera_.fov);
         quad_shader_.set_uniform("light.position", light_.position);
         quad_shader_.set_uniform("light.color", light_.color);
         quad_shader_.set_uniform("resolution", render_data.resolution);
-        quad_shader_.set_uniform("tex", fbo_.color_attachment(0));
+        quad_shader_.set_uniform("color", fbo_.color_attachment(0));
+        quad_shader_.set_uniform("depth", fbo_.depth_attachment());
+        prepare_effects(render_data, quad_shader_);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }

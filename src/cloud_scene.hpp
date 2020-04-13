@@ -13,12 +13,6 @@
 #include "engine/raymarcher.hpp"
 #include "color.hpp"
 
-static void print_loc(const char* fn, int l) {
-    std::cerr << "trace: " << fn << " (" << l << ")\n";
-}
-
-#define TRACE() print_loc(__PRETTY_FUNCTION__, __LINE__)
-
 namespace amyinorbit {
     using ecs::Entity;
     using ecs::World;
@@ -40,17 +34,15 @@ namespace amyinorbit {
             camera().fov = 60.f;
             light().position = vec3(10, 20, 10);
             background().rgb = color::hsv(200, 0.3, 0.9);
-            TRACE();
+
             {
                 paper_plane = ecs.create();
                 auto& m = ecs.add_component<Model>(paper_plane, models.model("paper_plane_nowalls.obj"));
-                TRACE();
                 m.texture_blend = 0.f;
                 auto& t = ecs.add_component<Transform>(paper_plane);
                 t.set_position(0, 10, 0);
                 camera().target = t.position();
             }
-            TRACE();
             {
                 ground = ecs.create();
                 auto& m = ecs.add_component<Model>(ground, models.model("ground.obj"));
@@ -59,7 +51,7 @@ namespace amyinorbit {
                 auto& t = ecs.add_component<Transform>(ground);
                 t.set_scale(vec3(100, 80, 100));
             }
-
+            set_effects(assets.shader("clouds.vert", "clouds.frag"));
         }
 
         ~CloudScene() {
@@ -88,13 +80,16 @@ namespace amyinorbit {
             }
 
             plane.translate(f_speed * plane.forward());
-            camera().position = plane.position() - 0.5 * plane.forward();
+            camera().position = plane.position() - 0.3 * plane.forward();
             camera().target=  plane.position();
         }
 
         void render_scene(App& app, const RenderData& rd) override {
             models.render(rd);
-            clouds.render(rd);
+        }
+
+        void prepare_effects(const RenderData& data, Shader& shader) override {
+            clouds.render(data, shader);
         }
     private:
         World ecs;

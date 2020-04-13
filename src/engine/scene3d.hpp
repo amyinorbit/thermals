@@ -22,6 +22,10 @@ namespace amyinorbit {
     class Scene3D : public App::Scene {
     public:
 
+        static constexpr int fx_texture_color = 0;
+        static constexpr int fx_texture_depth = 1;
+        static constexpr int fx_texture_custom = 2;
+
         Scene3D(App& app, AssetsLib& assets);
         ~Scene3D();
 
@@ -35,6 +39,9 @@ namespace amyinorbit {
         Camera& camera() { return camera_; }
         Light& light() { return light_; }
         vec4& background() { return background_; }
+
+        void set_effects(Shader shader) { quad_shader_ = shader; }
+        virtual void prepare_effects(const RenderData& data, Shader& shader) {}
 
     private:
 
