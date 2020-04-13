@@ -8,27 +8,29 @@
 //===--------------------------------------------------------------------------------------------===
 #pragma once
 #include <glue/handle.hpp>
+#include <glue/enum_utils.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <utility>
 #include <iostream>
 
 namespace amyinorbit::gl {
-    class VertexArray : public Handle<VertexArray> {
+    class VertexArray : public Handle<VertexArray, 2> {
     public:
-        const char* name() { return "vertex array"; }
+        struct Desc {};
 
-        static VertexArray create() {
-            VertexArray vao;
-            GLuint id;
-            glGenVertexArrays(1, &id);
-            vao.reset(id);
-            return vao;
-        }
+        template <typename T>
+        struct AttrDesc {
+            int count;
+            std::size_t stride;
+            std::size_t offset = 0;
+            bool normalize = false;
+        };
 
-        void destroy() {
-            GLuint name = id();
-            glDeleteVertexArrays(1, &name);
+        VertexArray() {}
+        VertexArray(const Desc& desc) {
+            reset(gc().create(glGenVertexArrays, glDeleteVertexArrays));
+            gl_check();
         }
 
         void bind() const { glBindVertexArray(id()); }

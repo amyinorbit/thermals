@@ -20,7 +20,6 @@ namespace amyinorbit {
 
         static inline gl::Tex2D perlin(const apm::uvec2& res, const apm::vec2& size, float freq) {
             auto h = size / apm::vec2(res);
-            auto tex = gl::Tex2D::create();
             float* data = alloc_data(res);
 
             SimplexNoise gen(freq); // Judge Gen Ahoy!
@@ -31,14 +30,14 @@ namespace amyinorbit {
                     data[index] = apm::remap(gen.fractal(8, r.x, r.y), -1.f, 1.f, 0.f, 1.f);
                 }
             }
-            tex.bind();
-            gl::Tex2D::DataDescr<float> desc;
+            gl::Tex2D::Desc<float> desc;
             desc.source_format = gl::TexFormat::red;
             desc.dest_format = gl::TexFormat::red;
             desc.size = res;
-            tex.upload_data(desc, data);
-            tex.set_wrap(gl::Tex2D::Wrap::repeat, gl::Tex2D::Wrap::repeat);
-            tex.set_mag_filter(gl::Tex2D::Filter::linear);
+            gl::Tex2D tex(desc, data);
+            tex.bind();
+            tex.set_wrap(gl::Wrap::repeat, gl::Wrap::repeat);
+            tex.set_mag_filter(gl::Filter::linear);
             tex.gen_mipmaps();
             delete data;
             return tex;
@@ -46,7 +45,6 @@ namespace amyinorbit {
 
         static inline gl::Tex3D perlin(const apm::uvec3& res, const apm::vec3& size, float freq) {
             auto h = size / apm::vec3(res);
-            auto tex = gl::Tex3D::create();
             float* data = alloc_data(res);
 
             SimplexNoise gen(freq); // Judge Gen Ahoy!
@@ -60,14 +58,15 @@ namespace amyinorbit {
                     }
                 }
             }
-            tex.bind();
-            gl::Tex3D::DataDescr<float> desc;
+            gl::Tex3D::Desc<float> desc;
             desc.source_format = gl::TexFormat::red;
             desc.dest_format = gl::TexFormat::red;
             desc.size = res;
-            tex.upload_data(desc, data);
-            tex.set_wrap(gl::Tex3D::Wrap::repeat, gl::Tex3D::Wrap::repeat, gl::Tex3D::Wrap::repeat);
-            tex.set_mag_filter(gl::Tex3D::Filter::linear);
+
+            gl::Tex3D tex(desc, data);
+            tex.bind();
+            tex.set_wrap(gl::Wrap::repeat, gl::Wrap::repeat, gl::Wrap::repeat);
+            tex.set_mag_filter(gl::Filter::linear);
             tex.gen_mipmaps();
             delete data;
             return tex;
@@ -75,9 +74,7 @@ namespace amyinorbit {
 
         static inline gl::Tex3D p_worley(const apm::uvec3& res, const apm::vec3& size, float freq) {
             auto h = size / apm::vec3(res);
-            auto tex = gl::Tex3D::create();
             float* data = alloc_data(res);
-
             WorleyNoise<3> gen_w(size, freq);
 
             // SimplexNoise gen_p(freq); // Judge Gen Ahoy!
@@ -91,14 +88,14 @@ namespace amyinorbit {
                     }
                 }
             }
-            tex.bind();
-            gl::Tex3D::DataDescr<float> desc;
+            gl::Tex3D::Desc<float> desc;
             desc.source_format = gl::TexFormat::red;
             desc.dest_format = gl::TexFormat::red;
             desc.size = res;
-            tex.upload_data(desc, data);
-            tex.set_wrap(gl::Tex3D::Wrap::repeat, gl::Tex3D::Wrap::repeat, gl::Tex3D::Wrap::repeat);
-            tex.set_mag_filter(gl::Tex3D::Filter::linear);
+            gl::Tex3D tex(desc, data);
+            tex.bind();
+            tex.set_wrap(gl::Wrap::repeat, gl::Wrap::repeat, gl::Wrap::repeat);
+            tex.set_mag_filter(gl::Filter::linear);
             tex.gen_mipmaps();
             delete data;
             return tex;

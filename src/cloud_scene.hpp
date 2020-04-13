@@ -55,7 +55,6 @@ namespace amyinorbit {
                 ground = ecs.create();
                 auto& m = ecs.add_component<Model>(ground, models.model("ground.obj"));
                 m.texture = assets.texture("tex.png");
-                m.texture.own();
                 m.texture_blend = 1.f;
                 auto& t = ecs.add_component<Transform>(ground);
                 t.set_scale(vec3(100, 80, 100));

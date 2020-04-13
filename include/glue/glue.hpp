@@ -11,6 +11,7 @@
 #include <apmath/vector.hpp>
 #include <apmath/matrix.hpp>
 #include <apmath/quaternion.hpp>
+#include "error.hpp"
 #include "buffer.hpp"
 #include "vertex_array.hpp"
 #include "shaders.hpp"

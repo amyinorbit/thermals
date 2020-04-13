@@ -12,6 +12,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <glue/gc.hpp>
 
 namespace amyinorbit::gl {
 
@@ -21,7 +22,7 @@ namespace amyinorbit::gl {
         stream_draw = GL_STREAM_DRAW,
     };
 
-    class Buffer : public Handle<Buffer> {
+    class Buffer : public Handle<Buffer, 2> {
     public:
 
         enum Type {
@@ -43,20 +44,10 @@ namespace amyinorbit::gl {
             return mappings[type_];
         }
 
-        static Buffer create(Type type) {
-            Buffer bo;
-            bo.type_ = type;
-            GLuint id;
-            glGenBuffers(1, &id);
-            bo.reset(id);
-            return bo;
-        }
-
-        const char* name() { return "buffer"; }
-
-        void destroy() {
-            GLuint name = id();
-            glDeleteBuffers(1, &name);
+        Buffer() {}
+        Buffer(Type type) : type_(type) {
+            reset(gc().create(glGenBuffers, glDeleteBuffers));
+            gl_check();
         }
 
         void bind() const { glBindBuffer(gl_type(), id()); }
@@ -65,16 +56,19 @@ namespace amyinorbit::gl {
         template <typename T>
         void allocate(std::size_t count, Usage usage = Usage::static_draw) {
             glBufferData(gl_type(), count * sizeof(T), nullptr, static_cast<GLenum>(usage));
+            gl_check();
         }
 
         template <typename T, std::size_t N>
         void set_data(const T (&data)[N], Usage usage = Usage::static_draw) {
             glBufferData(gl_type(), N * sizeof(T), (void*)&data[0], static_cast<GLenum>(usage));
+            gl_check();
         }
 
         template <typename T>
         void set_data(const std::vector<T>& data, Usage usage = Usage::static_draw) {
             glBufferData(gl_type(), data.size() * sizeof(T), (void*)data.data(), static_cast<GLenum>(usage));
+            gl_check();
         }
 
         template <typename T, std::size_t N>
@@ -82,6 +76,7 @@ namespace amyinorbit::gl {
             std::size_t size = N * sizeof(T);
             offset *= sizeof(T);
             glBufferSubData(gl_type(), (GLintptr)offset, size, (void*)&data[0]);
+            gl_check();
             return N;
         }
 
@@ -90,6 +85,7 @@ namespace amyinorbit::gl {
             std::size_t size = data.size() * sizeof(T);
             offset *= sizeof(T);
             glBufferSubData(gl_type(), (GLintptr)offset, size, (void*)data.data());
+            gl_check();
             return data.size();
         }
 

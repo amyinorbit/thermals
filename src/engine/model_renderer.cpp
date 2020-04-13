@@ -12,26 +12,18 @@
 namespace amyinorbit {
     using namespace gl;
 
-    #define DIAG() diagnose(__PRETTY_FUNCTION__, __LINE__)
-
-    void diagnose(const char* func, int line) {
-        auto err = glGetError();
-        if(err == GL_NO_ERROR) return;
-        std::cerr << "error (" << func << ":" << line << "): " << err << "\n";
-    }
-
     ModelRenderer::ModelRenderer(AssetsLib& assets, ecs::World& world)
     : assets_(assets), ecs(world), offset_(0) {
         std::cout << "[init] 3d model rendering module\n";
-        vao_ = VertexArray::create();
-        vao_.own().bind();
+        vao_ = VertexArray(VertexArray::Desc{});
+        vao_.bind();
 
-        vbo_ = Buffer::create(Buffer::array_buffer);
-        vbo_.own().bind();
+        vbo_ = Buffer(Buffer::array_buffer);
+        vbo_.bind();
         vbo_.allocate<float>(1024 * 1024);
 
         shader_ = assets_.shader("model.vsh", "model.fsh");
-        shader_.own().bind();
+        shader_.bind();
         Shader::AttrDescr<float> position, normal, texcoord;
         position.offset = 0;
         position.count = 3;
@@ -61,11 +53,9 @@ namespace amyinorbit {
         Model m;
         const auto& mesh = assets_.model(path);
         vao_.bind();
-        DIAG();
         vbo_.bind();
         m.offset = offset_;
         m.vertices = vbo_.sub_data(m.offset, mesh.data);
-        DIAG();
         offset_ += m.vertices;
         return m;
     }
@@ -73,9 +63,8 @@ namespace amyinorbit {
     void ModelRenderer::render(const RenderData& data) {
         // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         vao_.bind();
-        DIAG();
         shader_.bind();
-        DIAG();
+
         shader_.set_uniform("camera.position", data.camera.position);
         shader_.set_uniform("camera.target", data.camera.target);
         shader_.set_uniform("light.position", data.light.position);
@@ -87,11 +76,10 @@ namespace amyinorbit {
         for(const auto& [model, transform]: ecs.with<Model, Transform>()) {
             // std::cout << "rendering model at " << model.offset << "/" << model.vertices<< "\n";
             model.texture.bind();
-            DIAG();
+
             shader_.set_uniform("model", transform.transform());
             shader_.set_uniform("blend", model.texture_blend);
             glDrawArrays(GL_TRIANGLES, model.offset, model.vertices);
-            DIAG();
         }
     }
 }

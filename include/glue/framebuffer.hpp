@@ -13,84 +13,95 @@
 #include <GLFW/glfw3.h>
 #include <utility>
 #include <unordered_map>
+#include <array>
 
 namespace amyinorbit::gl {
 
-    class Renderbuffer : public Handle<Renderbuffer> {
+    class Renderbuffer : public Handle<Renderbuffer, 2> {
     public:
-        const char* name() { return "render buffer"; }
 
-        static Renderbuffer create() {
-            Renderbuffer rbo;
-            GLuint id;
-            glGenRenderbuffers(1, &id);
-            rbo.reset(id);
-            return rbo;
-        }
-
-        void destroy() {
-            GLuint name = id();
-            glDeleteFramebuffers(1, &name);
+        Renderbuffer() {}
+        Renderbuffer(TexFormat format, const uvec2& size) {
+            reset(gc().create(glGenRenderbuffers, glDeleteRenderbuffers));
+            gl_check();
+            bind();
+            allocate(format, size);
         }
 
         void bind() const { glBindRenderbuffer(GL_RENDERBUFFER, id()); }
         void unbind() const { glBindRenderbuffer(GL_RENDERBUFFER, 0); }
 
+    private:
         void allocate(TexFormat format, const uvec2& size) {
             glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(format), size.x, size.y);
+            gl_check();
         }
-
     };
 
-    class Framebuffer  : public Handle<Framebuffer> {
+    class Framebuffer : public Handle<Framebuffer, 2> {
     public:
-        const char* name() { return "frame buffer"; }
 
-        static Framebuffer create() {
-            Framebuffer tex;
-            GLuint id;
-            glGenFramebuffers(1, &id);
-            tex.reset(id);
-            return tex;
+        template <typename T>
+        struct Desc {
+            std::uint8_t color_count;
+            Tex2D::Desc<T> color[4];
+            Tex2D::Desc<T> depth;
+        };
+
+        Framebuffer() {}
+        template <typename T>
+        Framebuffer(const Desc<T>& desc) {
+            reset(gc().create(glGenFramebuffers, glDeleteFramebuffers));
+            bind();
+            for(std::uint8_t i = 0; i < desc.color_count; ++i) {
+                attach_color(i, desc.color[i]);
+            }
+            attach_depth(desc.depth);
         }
 
-        void destroy() {
-            GLuint name = id();
-            glDeleteFramebuffers(1, &name);
+        void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, id()); gl_check(); }
+        void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); gl_check(); }
+
+
+        Tex2D& depth_attachment() { return depth_stencil_; }
+        const Tex2D& depth_attachment() const { return depth_stencil_; }
+
+        Tex2D& color_attachment(int idx) { return colors_[idx]; }
+        const Tex2D& color_attachment(int idx) const { return colors_[idx]; }
+
+        template <typename T>
+        void attach_color(int idx, const Tex2D::Desc<T>& desc) {
+            colors_[idx] = Tex2D(desc);
+            colors_[idx].bind();
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0 + idx,
+                GL_TEXTURE_2D,
+                colors_[idx].id(), 0
+            );
+            gl_check();
         }
 
-        void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, id()); }
-        void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-
-        Tex2D& color_attachment(int idx) { return colors_.at(idx); }
-        const Tex2D& color_attachment(int idx) const { return colors_.at(idx); }
-
-        void attach_color(int idx, const Tex2D& tex) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, tex.id(), 0);
-            colors_.insert(std::make_pair(idx, tex));
-        }
-
-        void attach_color(int idx, Tex2D&& tex) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, tex.id(), 0);
-            colors_.insert(std::make_pair(idx, std::move(tex)));
-        }
-
-        void attach_depth_stencil(const Renderbuffer& rbo) {
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo.id());
-            depth_ = rbo;
-        }
-
-        void attach_depth_stencil(Renderbuffer&& rbo) {
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo.id());
-            depth_ = std::move(rbo);
+        template <typename T>
+        void attach_depth(const Tex2D::Desc<T>& desc) {
+            depth_stencil_ = Tex2D(desc);
+            depth_stencil_.bind();
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_DEPTH_ATTACHMENT,
+                GL_TEXTURE_2D,
+                depth_stencil_.id(), 0
+            );
+            gl_check();
         }
 
         static void clear() {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            gl_check();
         }
 
     private:
-        std::unordered_map<int, Tex2D> colors_;
-        Renderbuffer depth_;
+        std::array<Tex2D, 4> colors_;
+        Tex2D depth_stencil_;
     };
 }

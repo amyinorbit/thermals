@@ -20,24 +20,21 @@ namespace amyinorbit {
 
         // Set up a framebuffer to render everything
 
-        fbo_ = Framebuffer::create();
-        fbo_.own().bind();
+        Framebuffer::Desc<float> desc;
+        desc.color_count = 1;
+        desc.color[0].source_format = TexFormat::rgb;
+        desc.color[0].dest_format = TexFormat::rgb;
+        desc.color[0].size = app.point_size();
 
-        auto depth = Renderbuffer::create();
-        depth.own().bind();
-        depth.allocate(TexFormat::depth24_stencil8, app.point_size());
-        fbo_.attach_depth_stencil(std::move(depth));
+        desc.depth.size = app.point_size();
+        desc.depth.dest_format = TexFormat::depth_component;
+        desc.depth.source_format = TexFormat::depth_component;
 
-        color_ = Tex2D::create();
-        color_.own().bind();
-        color_.allocate(Tex2D::DataDescr<std::uint8_t>{
-            .source_format = TexFormat::rgb,
-            .dest_format = TexFormat::rgb,
-            .size = app.point_size()
-        });
-        color_.set_mag_filter(Tex2D::Filter::linear);
-        color_.set_min_filter(Tex2D::Filter::linear);
-        fbo_.attach_color(0, color_);
+        fbo_ = Framebuffer(desc);
+        auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if(status != GL_FRAMEBUFFER_COMPLETE) {
+            std::cerr << "incomplete framebuffer (" << std::hex << status << std::dec << ")\n";
+        }
         fbo_.unbind();
 
         const vec2 quad[] = {
@@ -51,15 +48,14 @@ namespace amyinorbit {
         };
 
         // Finally, set up the pipeline we'll use to render the scene's quad
-        quad_vao_ = VertexArray::create();
-        quad_vao_.own().bind();
+        quad_vao_ = VertexArray(VertexArray::Desc{});
+        quad_vao_.bind();
 
-        quad_vbo_ = Buffer::create(Buffer::array_buffer);
-        quad_vbo_.own().bind();
+        quad_vbo_ = Buffer(Buffer::array_buffer);
+        quad_vbo_.bind();
         quad_vbo_.set_data(quad);
 
         quad_shader_ = assets_.shader("fsquad.vsh", "fsquad.fsh");
-        quad_shader_.own();
         quad_shader_.bind();
 
         Shader::AttrDescr<float> position, texcoord;
@@ -86,6 +82,7 @@ namespace amyinorbit {
         app.viewport(app.point_size());
         glClearColor(background_.r, background_.g, background_.b, background_.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gl_check();
 
         RenderData render_data;
         render_data.light = light_;
@@ -104,14 +101,15 @@ namespace amyinorbit {
 
         quad_vao_.bind();
         quad_shader_.bind();
-        color_.bind(0);
+        fbo_.color_attachment(0).bind(0);
+        fbo_.depth_attachment().bind(1);
 
         quad_shader_.set_uniform("camera.position", camera_.position);
         quad_shader_.set_uniform("camera.target", camera_.target);
         quad_shader_.set_uniform("light.position", light_.position);
         quad_shader_.set_uniform("light.color", light_.color);
         quad_shader_.set_uniform("resolution", render_data.resolution);
-        quad_shader_.set_uniform("tex", color_);
+        quad_shader_.set_uniform("tex", fbo_.color_attachment(0));
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }

@@ -30,13 +30,12 @@ namespace amyinorbit {
         gl::Tex2D texture(const std::string& path) {
             gl::Image img(root_ + "/textures/" + path);
             if(!img.is_loaded()) throw std::runtime_error("cannot open texture file " + path);
-            auto tex = gl::Tex2D::create();
-            tex.bind();
+            auto tex = gl::Tex2D(img);
             tex.upload_data(img);
             tex.gen_mipmaps();
-            tex.set_mag_filter(gl::Tex2D::Filter::linear);
-            tex.set_min_filter(gl::Tex2D::Filter::nearest);
-            tex.set_wrap(Tex2D::Wrap::clamp_edge, Tex2D::Wrap::clamp_edge);
+            tex.set_mag_filter(gl::Filter::linear);
+            tex.set_min_filter(gl::Filter::nearest);
+            tex.set_wrap(gl::Wrap::clamp_edge, gl::Wrap::clamp_edge);
             return tex;
         }
 
@@ -46,7 +45,7 @@ namespace amyinorbit {
 
             auto vs_source = open(root_ + "/shaders/" + vertex);
             auto fs_source = open(root_ + "/shaders/" + fragment);
-            return Shader::create(vs_source, fs_source);
+            return Shader(vs_source, fs_source);
 
             // shaders_[key] = Shader::create(vs_source, fs_source);
             // shaders_[key].own();

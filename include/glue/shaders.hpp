@@ -22,28 +22,26 @@ namespace amyinorbit::gl {
     using namespace apm;
     using std::string;
 
-    class Stage : public Handle<Stage> {
+    class Stage : public Handle<Stage, 1> {
     public:
         enum Type {
             vertex = GL_VERTEX_SHADER,
             fragment = GL_FRAGMENT_SHADER
         };
 
-        const char* name() { return "shader stage"; }
-
-        static Stage create(Type type) {
-            Stage sh;
-            return sh.reset(glCreateShader((GLenum)type));
-        }
-
-        void destroy() {
-            glDeleteShader(id());
+        Stage() {}
+        Stage(Type type) {
+            reset(glCreateShader(static_cast<GLenum>(type)));
+            gl_check();
+            gc().intern(id(), glDeleteShader);
         }
 
         bool compile(const string& source) {
             const char* ptr = source.c_str();
             glShaderSource(id(), 1, &ptr, 0);
+            gl_check();
             glCompileShader(id());
+            gl_check();
             return is_compiled();
         }
 
@@ -71,8 +69,14 @@ namespace amyinorbit::gl {
     private:
     };
 
-    class Shader : public Handle<Shader> {
+    class Shader : public Handle<Shader, 1> {
     public:
+
+        struct Attr {
+            Shader& shader;
+            string name;
+            int location;
+        };
 
         template <typename T>
         struct AttrDescr {
@@ -82,45 +86,36 @@ namespace amyinorbit::gl {
             bool normalize = false;
         };
 
-        const char* name() { return "shader program"; }
+        Shader() {}
+        Shader(std::istream& vertex, std::istream& fragment) {
+            reset(glCreateProgram());
+            gl_check();
+            gc().intern(id(), glDeleteProgram);
 
-        static Shader create(std::istream& vertex, std::istream& fragment) {
-            Stage vs = Stage::create(Stage::vertex);
-            vs.own();
+            Stage vs = Stage(Stage::vertex);
             if(!vs.compile(vertex))
                 throw std::runtime_error("Error in vertex shader: " + vs.debug_message());
 
-            Stage fs = Stage::create(Stage::fragment);
-            fs.own();
+            Stage fs = Stage(Stage::fragment);
             if(!fs.compile(fragment))
                 throw std::runtime_error("Error in fragment shader: " + fs.debug_message());
 
-            Shader shader;
-            shader.reset(glCreateProgram());
-            shader.attach(vs);
-            shader.attach(fs);
-            if(!shader.link())
-                throw std::runtime_error("Error in shader: " + shader.debug_message());
-            return shader;
-        }
-
-        static Shader create() {
-            Shader p;
-            return p.reset(glCreateProgram());
-        }
-
-        void destroy() {
-            glDeleteProgram(id());
+            attach(vs);
+            attach(fs);
+            if(!link())
+                throw std::runtime_error("Error in shader: " + debug_message());
         }
 
         void attach(const Stage& sh) { glAttachShader(id(), sh.id()); }
 
         void bind_attr_loc(std::uint32_t loc, const string& attribute) {
             glBindAttribLocation(id(), loc, attribute.c_str());
+            gl_check();
         }
 
         bool link() {
             glLinkProgram(id());
+            gl_check();
             return get(GL_LINK_STATUS) == GL_TRUE;
         }
 
@@ -138,15 +133,18 @@ namespace amyinorbit::gl {
                                   descr.normalize,
                                   sizeof(T) * descr.stride,
                                   (const void*)(sizeof(T) * descr.offset));
+            gl_check();
         }
 
         template <typename T>
         void set_attrib_ptr(const std::string& name, const AttrDescr<T>& descr) {
             set_attrib_ptr<T>(get_attr_loc(name), descr);
+            gl_check();
         }
 
         void enable_attrib(int loc) {
             glEnableVertexAttribArray(loc);
+            gl_check();
         }
 
         template <typename T>
@@ -160,6 +158,7 @@ namespace amyinorbit::gl {
         template <int N>
         void set_uniform(int loc, const Texture<N>& tex) {
             glUniform1i(loc, tex.tex_unit());
+            gl_check();
         }
 
         void bind() const { glUseProgram(id()); }
@@ -169,6 +168,7 @@ namespace amyinorbit::gl {
             auto it = uniforms_.find(name);
             if(it != uniforms_.end()) return it->second;
             auto loc = glGetUniformLocation(id(), name.c_str());
+            gl_check();
             uniforms_[name] = loc;
             return loc;
         }
@@ -180,6 +180,7 @@ namespace amyinorbit::gl {
         int get(GLenum what) const {
             GLint out;
             glGetProgramiv(id(), what, &out);
+            gl_check();
             return out;
         }
 
@@ -196,56 +197,67 @@ namespace amyinorbit::gl {
     template <>
     inline void Shader::set_uniform(int loc, const std::int32_t& value) {
         glUniform1i(loc, value);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const int2& v) {
         glUniform2iv(loc, 1, v.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const ivec3& v) {
         glUniform3iv(loc, 1, v.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const ivec4& v) {
         glUniform4iv(loc, 1, v.data);
+        gl_check();
     }
 
 
     template <>
     inline void Shader::set_uniform(int loc, const float& value) {
         glUniform1f(loc, value);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const vec2& v) {
         glUniform2fv(loc, 1, v.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const vec3& v) {
         glUniform3fv(loc, 1, v.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const vec4& v) {
         glUniform4fv(loc, 1, v.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const mat2& m) {
         glUniformMatrix2fv(loc, 1, false, m.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const mat3& m) {
         glUniformMatrix3fv(loc, 1, false, m.data);
+        gl_check();
     }
 
     template <>
     inline void Shader::set_uniform(int loc, const mat4& m) {
         glUniformMatrix4fv(loc, 1, false, m.data);
+        gl_check();
     }
 }

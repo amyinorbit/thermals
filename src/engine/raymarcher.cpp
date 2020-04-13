@@ -13,11 +13,11 @@ namespace amyinorbit {
     using namespace gl;
 
     RayMarcher::RayMarcher(AssetsLib& assets) {
-        vao_ = VertexArray::create();
-        vao_.own().bind();
+        vao_ = VertexArray(VertexArray::Desc{});
+        vao_.bind();
 
-        vbo_ = Buffer::create(Buffer::array_buffer);
-        vbo_.own().bind();
+        vbo_ = Buffer(Buffer::array_buffer);
+        vbo_.bind();
 
         static const float quad[] = {
             -1, 1,
@@ -30,7 +30,7 @@ namespace amyinorbit {
         vbo_.set_data(quad);
 
         shader_ = assets.shader("raymarch.vert", "clouds.frag");
-        shader_.own().bind();
+        shader_.bind();
 
         Shader::AttrDescr<float> position;
         position.count = 2;
@@ -40,10 +40,7 @@ namespace amyinorbit {
         vao_.unbind();
 
         noise_ = Noise::p_worley(grid, apm::vec3(100.f), 5.f);
-        noise_.own();
-
         clouds_ = Noise::perlin(apm::uvec2(1024, 1024), apm::vec2(100.f), 0.1f);
-        clouds_.own();
     }
 
     void RayMarcher::render(const RenderData &data) {
