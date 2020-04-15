@@ -61,12 +61,11 @@ float density(vec3 p) {
 
 #define MAX_STEPS 64
 #define EPSILON 1e-3
-#define TAU 10.f
+#define INV_EPSILON 0.99999
+#define TAU 1.f
 
-// We use these to have a ramp, the closer to the camera we are, the more precise we
-// want to be with our sampling. At least I hope.
-#define START_STEP 0.01f
-#define END_STEP 5.f
+#define STEP_SIZE 2.f
+// #define STEP_FINE 0.1f
 
 float beerLambert(float density, float distance) {
     return exp(-TAU * density * distance);
@@ -76,12 +75,13 @@ float cloudOpacity(vec3 origin, vec3 direction, float sceneDepth) {
 
     vec3 pos = origin + EPSILON * direction;
     float trans = 1.f;
-    float stepSize = START_STEP;
+    float stepSize = STEP_SIZE;
     mat4 pv = projection * view;
+
+    bool hasHit = false;
 
     for(int i = 0; i < MAX_STEPS; ++i) {
         float dt = beerLambert(density(pos), stepSize);
-        stepSize = mix(START_STEP, END_STEP, float(i)/float(MAX_STEPS));
 
         trans *= dt;
         if(trans < EPSILON) break;
