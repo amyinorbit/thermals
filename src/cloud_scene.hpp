@@ -12,16 +12,17 @@
 #include "engine/model_renderer.hpp"
 #include "engine/raymarcher.hpp"
 #include "color.hpp"
+#include "imgui/imgui.h"
 
 namespace amyinorbit {
     using ecs::Entity;
     using ecs::World;
 
-    inline vec3 cartesian(const vec3& s) {
+    inline vec3 cartesian(float el, float az, float d) {
         return vec3(
-            s[2] * std::cos(s[1]) * std::sin(s[0]),
-            s[2] * std::sin(s[1]),
-            s[2] * std::cos(s[1]) * std::cos(s[0])
+            d * std::cos(el) * std::sin(az),
+            d * std::sin(el),
+            d * std::cos(el) * std::cos(az)
         );
     }
 
@@ -32,56 +33,37 @@ namespace amyinorbit {
         , clouds(assets)
         , models(assets, ecs) {
             camera().fov = 60.f;
+            camera().position = vec3(40);
+            camera().target = vec3(0);
             light().position = vec3(10, 20, 10);
             background().rgb = color::hsv(200, 0.3, 0.9);
 
             {
-                paper_plane = ecs.create();
-                auto& m = ecs.add_component<Model>(paper_plane, models.model("paper_plane_nowalls.obj"));
-                m.texture_blend = 0.f;
-                auto& t = ecs.add_component<Transform>(paper_plane);
-                t.set_position(0, 10, 0);
-                camera().target = t.position();
-            }
-            {
                 ground = ecs.create();
-                auto& m = ecs.add_component<Model>(ground, models.model("ground.obj"));
+                auto& m = ecs.add_component<Model>(ground, models.model("plane.obj"));
                 m.texture = assets.texture("tex.png");
                 m.texture_blend = 1.f;
                 auto& t = ecs.add_component<Transform>(ground);
-                t.set_scale(vec3(100, 80, 100));
+                t.set_scale(world.size);
             }
             set_effects(assets.shader("clouds.vert", "clouds.frag"));
         }
 
         ~CloudScene() {
-            ecs.destroy(paper_plane);
             ecs.destroy(ground);
         }
 
+        void gui(App& app) override {
+            ImGui::Begin("Camera Settings");
+            ImGui::SliderAngle("azimuth", &azimuth);
+            ImGui::SliderAngle("elevation", &elevation, 5.f, 80.f);
+            ImGui::SliderFloat("distance", &distance, 1.f, 20.f);
+            ImGui::SliderFloat("field of view", &camera().fov, 20.f, 80.f, "%.1f deg");
+            camera().position = cartesian(elevation, azimuth, distance);
+            ImGui::End();
+        }
+
         void update(App& app) override {
-            auto in = app.input();
-            auto& plane = ecs.get_component<Transform>(paper_plane);
-
-            float f_speed = 2 * app.time().delta;
-
-            float pitch_speed = apm::radians(90.f) * app.time().delta;
-            float yaw_speed = apm::radians(45.f) * app.time().delta;
-
-            if(in.down(Key::up)) {
-                plane.rotate(apm::rotate(plane.right(), -pitch_speed));
-            } else if(in.down(Key::down)) {
-                plane.rotate(apm::rotate(plane.right(), pitch_speed));
-            }
-            if(in.down(Key::left)) {
-                plane.rotate(apm::rotate(apm::up<float>, yaw_speed));
-            } else if(in.down(Key::right)) {
-                plane.rotate(apm::rotate(apm::up<float>, -yaw_speed));
-            }
-
-            plane.translate(f_speed * plane.forward());
-            camera().position = plane.position() - 0.3 * plane.forward();
-            camera().target=  plane.position();
         }
 
         void render_scene(App& app, const RenderData& rd) override {
@@ -96,6 +78,13 @@ namespace amyinorbit {
         RayMarcher clouds;
         ModelRenderer models;
 
-        Entity ground, paper_plane;
+        Entity ground;
+
+        float elevation = apm::radians(45.f);
+        float azimuth = apm::radians(90.f);
+        float distance = 10.f;
+        struct {
+            vec3 size{10, 10, 10};
+        } world;
     };
 }

@@ -38,7 +38,7 @@ namespace amyinorbit::gl {
         // Initialize ImGUI
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        auto& io = ImGui::GetIO();
+        ImGui::GetIO();
 
         ImGui_ImplGlfw_InitForOpenGL(window_.impl(), true);
         ImGui_ImplOpenGL3_Init();

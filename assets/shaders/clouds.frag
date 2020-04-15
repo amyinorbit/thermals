@@ -50,21 +50,21 @@ float bubble(vec2 pos) {
 // "basic" density function. We use the coverage map, along with a height barrier,
 // and the "carve out" with the 3d noise texture (see Nubis papers)
 float density(vec3 p) {
-    vec3 texcoord = (p / 200.f) + vec3(0.5);
+    vec3 texcoord = (p / 20.f) + vec3(0.5);
 
-    float h = height(p.y, 25, 3);
-    float noiseValue = texture(noise, texcoord.xzy * 5).r;
+    float h = height(p.y, 5, 2);
+    float noiseValue = texture(noise, texcoord.xzy).r;
     float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.f, 1.f, 0.f, 1.f);
 
     return remap(noiseValue, coverageValue, 1.f, 0.f, 1.f) * h;
 }
 
-#define MAX_STEPS 64
+#define MAX_STEPS 200
 #define EPSILON 1e-3
 #define INV_EPSILON 0.99999
-#define TAU 1.f
+#define TAU 5.f
 
-#define STEP_SIZE 2.f
+#define STEP_SIZE 0.5f
 // #define STEP_FINE 0.1f
 
 float beerLambert(float density, float distance) {
