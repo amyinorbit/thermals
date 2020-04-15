@@ -31,44 +31,15 @@ namespace amyinorbit::gl {
             virtual void on_end(App& app) {}
             virtual void update(App& app) {}
             virtual void render(App& app) {}
+            virtual void gui(App& app) {}
         };
 
-        App(const Window::Attrib& main_window) {
-            if(!glfwInit()) throw std::runtime_error("error initialising glfw");
-            glfwSetErrorCallback([](int code, const char* message) {
-                std::cerr << "gl error (" << code << "): " << message << "\n";
-            });
+        App(const Window::Attrib& main_window);
+        ~App();
 
-            window_ = Window(main_window);
-            window_.make_current();
-            gladLoadGL();
-            auto size = window_.framebuffer_size();
-            glViewport(0, 0, size.x, size.y);
-            glfwSwapInterval(1);
-            glEnable(GL_DEPTH_TEST);
-            glDepthFunc(GL_LESS);
-            glEnable(GL_CULL_FACE);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            last_update_ = glfwGetTime();
-            time_.total = 0;
-            time_.delta = 0;
-
-            size_.logical = main_window.size;
-            size_.physical = size;
-        }
-
-        ~App() {
-            show(nullptr);
-            window_.destroy();
-            glfwTerminate();
-        }
-
-        void show(Scene* sc) {
-            if(scene_) scene_->on_end(*this);
-            scene_.reset(sc);
-            if(scene_) scene_->on_start(*this);
-        }
+        void show(Scene* sc);
+        void run();
+        void update();
 
         template <
             typename T,
@@ -78,25 +49,6 @@ namespace amyinorbit::gl {
         >
         void show(Args&&... args) {
             show(new T(*this, std::forward<Args>(args)...));
-        }
-
-        void run() {
-            while(!window_.should_close()) {
-                update();
-            }
-        }
-
-        void update() {
-            double now = glfwGetTime();
-            time_.delta = now - last_update_;
-            time_.total += time_.delta;
-            last_update_ = now;
-            if(scene_) {
-                scene_->update(*this);
-                scene_->render(*this);
-            }
-            window_.swap();
-            glfwPollEvents();
         }
 
         void viewport(const uvec2& size) {

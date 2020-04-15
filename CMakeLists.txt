@@ -5,12 +5,18 @@ add_executable(${PROJECT_NAME}
     src/ecs/entity.cpp
     src/ecs/world.cpp
     src/main.cpp
+    src/engine/app.cpp
     src/engine/SimplexNoise.cpp
     src/engine/image.cpp
     src/engine/scene3d.cpp
     src/engine/model_renderer.cpp
     src/engine/obj_loader.cpp
     src/engine/raymarcher.cpp
+    src/imgui/imgui.cpp
+    src/imgui/imgui_draw.cpp
+    src/imgui/imgui_widgets.cpp
+    src/imgui/imgui_impl_glfw.cpp
+    src/imgui/imgui_impl_opengl3.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
