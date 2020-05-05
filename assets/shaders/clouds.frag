@@ -31,6 +31,9 @@ uniform vec2 resolution;
 uniform mat4 projection;
 uniform mat4 view;
 uniform float time;
+uniform float wind_speed;
+
+const vec3 wind_dir = vec3(0.01f, 0.f, 0.f);
 
 float remap(float x, float i_min, float i_max, float o_min, float o_max) {
     return o_min + (x - i_min)*(o_max-o_min)/(i_max-i_min);
@@ -40,20 +43,13 @@ float height(float y, float alt, float dev) {
     return exp(- pow(y-alt, 2.f) / (2.f * pow(dev, 2.f)));
 }
 
-float bubble(vec2 pos) {
-    float d = distance(pos, vec2(5, -10));
-    if(d < 5.f) return 1.f;
-    return 0.f;
-    // return exp(- pow(d, 2.f) / (2.f * pow(2.f, 2.f)));
-}
-
 // "basic" density function. We use the coverage map, along with a height barrier,
 // and the "carve out" with the 3d noise texture (see Nubis papers)
 float density(vec3 p) {
     vec3 texcoord = (p / 20.f) + vec3(0.5);
 
-    float h = height(p.y, 5, 2);
-    float noiseValue = texture(noise, texcoord.xzy).r;
+    float h = height(p.y, 8, 1.5);
+    float noiseValue = texture(noise, texcoord.xzy + time * wind_speed * wind_dir).r;
     float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.f, 1.f, 0.f, 1.f);
 
     return remap(noiseValue, coverageValue, 1.f, 0.f, 1.f) * h;
@@ -61,10 +57,10 @@ float density(vec3 p) {
 
 #define MAX_STEPS 200
 #define EPSILON 1e-3
-#define INV_EPSILON 0.99999
+#define INV_EPSILON (1 - EPSILON)
 #define TAU 5.f
 
-#define STEP_SIZE 0.5f
+#define STEP_SIZE 0.2f
 // #define STEP_FINE 0.1f
 
 float beerLambert(float density, float distance) {

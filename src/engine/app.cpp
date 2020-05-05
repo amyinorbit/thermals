@@ -20,8 +20,6 @@ namespace amyinorbit::gl {
         window_ = Window(main_window);
         window_.make_current();
         gladLoadGL();
-        auto size = window_.framebuffer_size();
-        glViewport(0, 0, size.x, size.y);
         glfwSwapInterval(1);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -33,7 +31,8 @@ namespace amyinorbit::gl {
         time_.delta = 0;
 
         size_.logical = main_window.size;
-        size_.physical = size;
+        size_.physical = window_.framebuffer_size();;
+        glViewport(0, 0, size_.physical.x, size_.physical.y);
 
         // Initialize ImGUI
         IMGUI_CHECKVERSION();

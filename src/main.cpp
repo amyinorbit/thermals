@@ -19,6 +19,7 @@ int main(int argc, const char** argv) {
     config.name = "Thermals";
     config.size = {1280, 720};
     config.version = {4, 1};
+    config.is_fullscreen = false;
 
     try {
         AssetsLib assets("assets");

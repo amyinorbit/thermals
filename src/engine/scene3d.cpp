@@ -112,6 +112,7 @@ namespace amyinorbit {
         quad_shader_.set_uniform("resolution", render_data.resolution);
         quad_shader_.set_uniform("color", fbo_.color_attachment(0));
         quad_shader_.set_uniform("depth", fbo_.depth_attachment());
+        quad_shader_.set_uniform("time", app.time().total);
         prepare_effects(render_data, quad_shader_);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

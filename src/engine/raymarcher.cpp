@@ -16,7 +16,7 @@ namespace amyinorbit {
     RayMarcher::RayMarcher(AssetsLib& assets) {
         noise_ = Noise::perlin(apm::uvec3(grid), apm::vec3(10.f), 1.f);
         clouds_ = Noise::perlin(apm::uvec2(1024, 1024), apm::vec2(10.f), 0.1f);
-        clouds_.set_wrap(Wrap::clamp_edge, Wrap::clamp_edge);
+        // clouds_.set_wrap(Wrap::clamp_edge, Wrap::clamp_edge);
     }
 
     void RayMarcher::render(const RenderData &data, Shader& shader) {

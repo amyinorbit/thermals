@@ -57,8 +57,9 @@ namespace amyinorbit {
             ImGui::Begin("Camera Settings");
             ImGui::SliderAngle("azimuth", &azimuth);
             ImGui::SliderAngle("elevation", &elevation, 5.f, 80.f);
-            ImGui::SliderFloat("distance", &distance, 1.f, 20.f);
-            ImGui::SliderFloat("field of view", &camera().fov, 20.f, 80.f, "%.1f deg");
+            ImGui::SliderFloat("distance", &distance, 1.f, 40.f);
+            ImGui::SliderFloat("field of view", &camera().fov, 20.f, 120.f, "%.1f deg");
+            ImGui::SliderFloat("wind speed", &wind_speed, 0.f, 5.f, "%.2f");
             camera().position = cartesian(elevation, azimuth, distance);
             ImGui::End();
         }
@@ -71,6 +72,7 @@ namespace amyinorbit {
         }
 
         void prepare_effects(const RenderData& data, Shader& shader) override {
+            shader.set_uniform("wind_speed", wind_speed);
             clouds.render(data, shader);
         }
     private:
@@ -80,6 +82,7 @@ namespace amyinorbit {
 
         Entity ground;
 
+        float wind_speed = 1.f;
         float elevation = apm::radians(45.f);
         float azimuth = apm::radians(90.f);
         float distance = 10.f;

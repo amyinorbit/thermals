@@ -22,12 +22,13 @@ namespace amyinorbit::gl {
     class Window {
     public:
         struct Attrib {
-            uvec2 size;
+            uvec2 size = uvec2(1024, 600);
             string name;
+            bool is_fullscreen = false;
 
             struct {
-                int major;
-                int minor;
+                int major = 4;
+                int minor = 0;
             } version;
         };
 
@@ -38,7 +39,13 @@ namespace amyinorbit::gl {
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-            impl_ = glfwCreateWindow(cfg.size.x, cfg.size.y, cfg.name.c_str(), nullptr, nullptr);
+            impl_ = glfwCreateWindow(
+                cfg.size.x,
+                cfg.size.y,
+                cfg.name.c_str(),
+                cfg.is_fullscreen ? glfwGetPrimaryMonitor() : nullptr,
+                nullptr
+            );
             if(!impl_) {
                 throw std::runtime_error("unable to create new window");
             }
