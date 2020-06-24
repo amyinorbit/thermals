@@ -36,6 +36,7 @@ namespace amyinorbit {
             camera().position = vec3(40);
             camera().target = vec3(0);
             light().position = vec3(10, 20, 10);
+            light().color = vec3(1.f, 0.95f, 0.9f);
             background().rgb = color::hsv(200, 0.3, 0.9);
 
             {

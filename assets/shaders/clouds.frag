@@ -36,7 +36,7 @@ uniform float wind_speed;
 const vec3 wind_dir = vec3(0.01f, 0.f, 0.f);
 
 float remap(float x, float i_min, float i_max, float o_min, float o_max) {
-    return o_min + (x - i_min)*(o_max-o_min)/(i_max-i_min);
+    return clamp(o_min + (x - i_min)*(o_max-o_min)/(i_max-i_min), o_min, o_max);
 }
 
 float height(float y, float alt, float dev) {
@@ -47,18 +47,32 @@ float height(float y, float alt, float dev) {
 // and the "carve out" with the 3d noise texture (see Nubis papers)
 float density(vec3 p) {
     vec3 texcoord = (p / 20.f) + vec3(0.5);
-
     float h = height(p.y, 8, 1.5);
-    float noiseValue = texture(noise, texcoord.xzy + time * wind_speed * wind_dir).r;
-    float coverageValue = remap(texture(clouds, texcoord.xz).r, 0.f, 1.f, 0.f, 1.f);
-
+    float noiseValue = texture(noise, (texcoord.xzy) + time * wind_speed * wind_dir).r;
+    float coverageValue = texture(clouds, texcoord.xz).r;
     return remap(noiseValue, coverageValue, 1.f, 0.f, 1.f) * h;
 }
 
-#define MAX_STEPS 200
+#define PI 3.14
+
+// This is the "intro" to light scattering
+//
+float HGscattering(float cosAngle, float eccentricity) {
+    return ((1.0 - eccentricity * eccentricity) / pow((1.0 + eccentricity * eccentricity - 2.0 * eccentricity * cosAngle), 3.0 / 2.0)) / 4.0 * PI;
+}
+
+float scattering(vec3 dir, vec3 p) {
+    vec3 lightDir = p - light.position;
+    float cosAngle = dot(normalize(lightDir), normalize(dir));
+
+
+    return HGscattering(cosAngle, 0.9);
+}
+
+#define MAX_STEPS 400
 #define EPSILON 1e-3
 #define INV_EPSILON (1 - EPSILON)
-#define TAU 5.f
+#define TAU 10.f
 
 #define STEP_SIZE 0.2f
 // #define STEP_FINE 0.1f
@@ -67,9 +81,10 @@ float beerLambert(float density, float distance) {
     return exp(-TAU * density * distance);
 }
 
-float cloudOpacity(vec3 origin, vec3 direction, float sceneDepth) {
+vec4 cloudOpacity(vec3 origin, vec3 direction, float sceneDepth) {
 
     vec3 pos = origin + EPSILON * direction;
+    vec3 cloud_color = vec3(0.0f);
     float trans = 1.f;
     float stepSize = STEP_SIZE;
     mat4 pv = projection * view;
@@ -80,18 +95,19 @@ float cloudOpacity(vec3 origin, vec3 direction, float sceneDepth) {
         float dt = beerLambert(density(pos), stepSize);
 
         trans *= dt;
+        cloud_color += 0.1 * scattering(direction, origin) * light.color;
         if(trans < EPSILON) break;
         vec4 dv = pv * vec4(pos, 1);
         float curDepth = 0.5 * ((dv.z/dv.w) + 1.0);
         if(curDepth > sceneDepth) break;
         pos += stepSize * direction;
     }
-    return clamp(1-trans, 0, 1);
+    return vec4(cloud_color, clamp(1-trans, 0, 1));
 }
 
 void main() {
     vec3 sceneColor = texture(color, texCoord).rgb;
-    float opacity = cloudOpacity(ray.origin, ray.direction, texture(depth, texCoord).r);
-    vec3 total = mix(sceneColor, vec3(1), opacity);
+    vec4 cloud = cloudOpacity(ray.origin, ray.direction, texture(depth, texCoord).r);
+    vec3 total = mix(sceneColor, cloud.rgb, cloud.a);
     fragColor = vec4(total, 1);
 }
