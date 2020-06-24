@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <unordered_map>
 #include <cassert>
+#include <string>
 
 // #define GL_GC_TRACE
 #ifdef GL_GC_TRACE
